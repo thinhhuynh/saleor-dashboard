@@ -29,13 +29,15 @@ import { AttributeValueDelete } from "../types/AttributeValueDelete";
 
 export const ATTRIBUTE_TYPES_WITH_DEDICATED_VALUES = [
   AttributeInputTypeEnum.DROPDOWN,
-  AttributeInputTypeEnum.MULTISELECT
+  AttributeInputTypeEnum.MULTISELECT,
+  AttributeInputTypeEnum.SWATCH
 ];
 
 export const ATTRIBUTE_TYPES_WITH_CONFIGURABLE_FACED_NAVIGATION = [
   AttributeInputTypeEnum.DROPDOWN,
   AttributeInputTypeEnum.MULTISELECT,
-  AttributeInputTypeEnum.BOOLEAN
+  AttributeInputTypeEnum.BOOLEAN,
+  AttributeInputTypeEnum.SWATCH
 ];
 
 export interface AttributeReference {

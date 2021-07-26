@@ -73,6 +73,10 @@ export const inputTypeMessages = defineMessages({
   boolean: {
     defaultMessage: "Boolean",
     description: "boolean attribute type"
+  },
+  swatch: {
+    defaultMessage: "Swatch",
+    description: "swatch attribute type"
   }
 });
 

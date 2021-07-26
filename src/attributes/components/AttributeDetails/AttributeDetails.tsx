@@ -100,6 +100,10 @@ const AttributeDetails: React.FC<AttributeDetailsProps> = props => {
     {
       label: intl.formatMessage(inputTypeMessages.boolean),
       value: AttributeInputTypeEnum.BOOLEAN
+    },
+    {
+      label: intl.formatMessage(inputTypeMessages.swatch),
+      value: AttributeInputTypeEnum.SWATCH
     }
   ];
   const entityTypeChoices = [

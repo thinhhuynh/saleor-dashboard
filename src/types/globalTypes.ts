@@ -95,6 +95,7 @@ export enum AttributeInputTypeEnum {
   NUMERIC = "NUMERIC",
   REFERENCE = "REFERENCE",
   RICH_TEXT = "RICH_TEXT",
+  SWATCH = "SWATCH",
 }
 
 export enum AttributeSortField {
@@ -1143,7 +1144,7 @@ export interface AttributeUpdateInput {
   slug?: string | null;
   unit?: MeasurementUnitsEnum | null;
   removeValues?: (string | null)[] | null;
-  addValues?: (AttributeValueCreateInput | null)[] | null;
+  addValues?: (AttributeValueUpdateInput | null)[] | null;
   valueRequired?: boolean | null;
   isVariantOnly?: boolean | null;
   visibleInStorefront?: boolean | null;
@@ -1154,9 +1155,11 @@ export interface AttributeUpdateInput {
 }
 
 export interface AttributeValueCreateInput {
-  name: string;
   value?: string | null;
   richText?: any | null;
+  fileUrl?: string | null;
+  contentType?: string | null;
+  name: string;
 }
 
 export interface AttributeValueInput {
@@ -1172,6 +1175,14 @@ export interface AttributeValueInput {
 export interface AttributeValueTranslationInput {
   name?: string | null;
   richText?: any | null;
+}
+
+export interface AttributeValueUpdateInput {
+  value?: string | null;
+  richText?: any | null;
+  fileUrl?: string | null;
+  contentType?: string | null;
+  name?: string | null;
 }
 
 export interface BulkAttributeValueInput {
