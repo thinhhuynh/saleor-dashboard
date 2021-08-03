@@ -208,6 +208,7 @@ export const fragmentOrderDetails = gql`
       id
     }
     shippingMethodName
+    collectionPointName
     shippingPrice {
       gross {
         amount

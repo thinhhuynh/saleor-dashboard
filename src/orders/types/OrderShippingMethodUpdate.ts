@@ -505,6 +505,7 @@ export interface OrderShippingMethodUpdate_orderUpdateShipping_order {
   number: string | null;
   paymentStatus: PaymentChargeStatusEnum;
   shippingAddress: OrderShippingMethodUpdate_orderUpdateShipping_order_shippingAddress | null;
+  collectionPointName: string | null;
   status: OrderStatus;
   subtotal: OrderShippingMethodUpdate_orderUpdateShipping_order_subtotal;
   actions: (OrderAction | null)[];

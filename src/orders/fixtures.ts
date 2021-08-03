@@ -1298,6 +1298,7 @@ export const order = (placeholder: string): OrderDetails_order => ({
   },
   shippingMethod: null,
   shippingMethodName: "Registred priority",
+  collectionPointName: null,
   shippingPrice: {
     __typename: "TaxedMoney",
     gross: {
@@ -1511,6 +1512,7 @@ export const draftOrder = (placeholder: string): OrderDetails_order => ({
   shippingAddress: null,
   shippingMethod: null,
   shippingMethodName: null,
+  collectionPointName: "Fabryka Keramzytu",
   shippingPrice: {
     __typename: "TaxedMoney" as "TaxedMoney",
     gross: {

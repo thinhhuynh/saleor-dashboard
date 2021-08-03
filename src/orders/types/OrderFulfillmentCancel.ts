@@ -494,6 +494,7 @@ export interface OrderFulfillmentCancel_orderFulfillmentCancel_order {
   shippingAddress: OrderFulfillmentCancel_orderFulfillmentCancel_order_shippingAddress | null;
   shippingMethod: OrderFulfillmentCancel_orderFulfillmentCancel_order_shippingMethod | null;
   shippingMethodName: string | null;
+  collectionPointName: string | null;
   shippingPrice: OrderFulfillmentCancel_orderFulfillmentCancel_order_shippingPrice;
   status: OrderStatus;
   subtotal: OrderFulfillmentCancel_orderFulfillmentCancel_order_subtotal;
