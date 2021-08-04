@@ -3115,6 +3115,7 @@ type Order implements Node & ObjectWithMetadata {
   lines: [OrderLine]!
   actions: [OrderAction]!
   availableShippingMethods: [ShippingMethod]
+  availableCollectionPoints: [Warehouse!]!
   invoices: [Invoice]
   number: String
   original: ID
