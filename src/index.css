@@ -62,3 +62,15 @@ body {
     height: auto !important;
   }
 }
+
+[data-portal-for="category-list"] > ul > li {
+  display: block;
+}
+
+[data-portal-for="category-list"] & li > span {
+  display: inline;
+}
+
+.noBorder {
+  border: none;
+}

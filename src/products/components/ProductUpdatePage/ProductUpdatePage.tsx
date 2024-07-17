@@ -18,13 +18,14 @@ import { ConfirmButtonTransitionState } from "@dashboard/components/ConfirmButto
 import { useDevModeContext } from "@dashboard/components/DevModePanel/hooks";
 import { DetailPageLayout } from "@dashboard/components/Layouts";
 import { Metadata } from "@dashboard/components/Metadata/Metadata";
-import Savebar from "@dashboard/components/Savebar";
+import { Savebar } from "@dashboard/components/Savebar";
 import { SeoForm } from "@dashboard/components/SeoForm";
 import { Choice } from "@dashboard/components/SingleSelectField";
 import {
   ChannelFragment,
   PermissionEnum,
   ProductChannelListingErrorFragment,
+  ProductDetailsQuery,
   ProductDetailsVariantFragment,
   ProductErrorFragment,
   ProductErrorWithAttributesFragment,
@@ -45,6 +46,7 @@ import ProductExternalMediaDialog from "@dashboard/products/components/ProductEx
 import { ProductOrganization } from "@dashboard/products/components/ProductOrganization/ProductOrganization";
 import { defaultGraphiQLQuery } from "@dashboard/products/queries";
 import { productImageUrl, productListUrl } from "@dashboard/products/urls";
+import { ChoiceWithAncestors, getChoicesWithAncestors } from "@dashboard/products/utils/utils";
 import { ProductVariantListError } from "@dashboard/products/views/ProductUpdate/handlers/errors";
 import { UseProductUpdateHandlerError } from "@dashboard/products/views/ProductUpdate/handlers/useProductUpdateHandler";
 import { FetchMoreProps, RelayToFlat } from "@dashboard/types";
@@ -78,7 +80,7 @@ export interface ProductUpdatePageProps {
   limits: RefreshLimitsQuery["shop"]["limits"];
   variants: ProductDetailsVariantFragment[];
   media: ProductFragment["media"];
-  product: ProductFragment;
+  product: ProductDetailsQuery["product"];
   header: string;
   saveButtonBarState: ConfirmButtonTransitionState;
   taxClasses: TaxClassBaseFragment[];
@@ -168,7 +170,10 @@ export const ProductUpdatePage: React.FC<ProductUpdatePageProps> = ({
     getChoices(maybe(() => product.collections, [])),
   );
   const [selectedTaxClass, setSelectedTaxClass] = useStateFromProps(product?.taxClass?.name ?? "");
-  const categories = getChoices(categoryChoiceList);
+  const categories = getChoicesWithAncestors(categoryChoiceList);
+  const selectedProductCategory = product?.category
+    ? getChoicesWithAncestors([product.category as ChoiceWithAncestors])[0]
+    : undefined;
   const collections = getChoices(collectionChoiceList);
   const hasVariants = product?.productType?.hasVariants;
   const taxClassesChoices =
@@ -330,6 +335,7 @@ export const ProductUpdatePage: React.FC<ProductUpdatePageProps> = ({
                 />
               )}
               <ProductVariants
+                productId={productId}
                 productName={product?.name}
                 errors={variantListErrors}
                 channels={listings}
@@ -377,6 +383,7 @@ export const ProductUpdatePage: React.FC<ProductUpdatePageProps> = ({
                 productType={product?.productType}
                 onCategoryChange={handlers.selectCategory}
                 onCollectionChange={handlers.selectCollection}
+                selectedProductCategory={selectedProductCategory}
               />
               <ChannelsAvailabilityCard {...availabilityCommonProps} channels={listings ?? []} />
               <Box paddingBottom={52}>
@@ -391,13 +398,17 @@ export const ProductUpdatePage: React.FC<ProductUpdatePageProps> = ({
               </Box>
             </DetailPageLayout.RightSidebar>
 
-            <Savebar
-              onCancel={() => navigate(productListUrl())}
-              onDelete={onDelete}
-              onSubmit={submit}
-              state={saveButtonBarState}
-              disabled={isSaveDisabled}
-            />
+            <Savebar>
+              <Savebar.DeleteButton onClick={onDelete} />
+              <Savebar.Spacer />
+              <Savebar.CancelButton onClick={() => navigate(productListUrl())} />
+              <Savebar.ConfirmButton
+                transitionState={saveButtonBarState}
+                onClick={submit}
+                disabled={isSaveDisabled}
+              />
+            </Savebar>
+
             {canOpenAssignReferencesAttributeDialog && entityType && (
               <AssignAttributeValueDialog
                 entityType={entityType}

@@ -41,9 +41,9 @@ export const OrderTransactionSummary: React.FC<OrderTransactionSummaryProps> = (
   return (
     <DashboardCard>
       <DashboardCard.Content display="flex" flexDirection="column" gap={5}>
-        <Text fontWeight="medium" marginTop={6}>
+        <DashboardCard.Title paddingX={0}>
           <FormattedMessage {...messages.amount} />
-        </Text>
+        </DashboardCard.Title>
         <Text as="p">
           <FormattedMessage {...messages.amountDescription} />
         </Text>
@@ -130,6 +130,7 @@ export const OrderTransactionSummary: React.FC<OrderTransactionSummaryProps> = (
               type="number"
               value={amountField.value}
               onChange={amountField.onChange}
+              onBlur={event => amountField.onChange(parseFloat(event.target.value))}
               error={!!amountError}
               __width={100}
               endAdornment={currency}

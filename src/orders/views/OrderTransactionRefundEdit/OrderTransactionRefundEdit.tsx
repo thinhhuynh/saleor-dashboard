@@ -1,6 +1,7 @@
 import {
   OrderDetailsGrantRefundDocument,
   OrderDetailsGrantRefundFragment,
+  OrderGrantRefundUpdateErrorCode,
   useOrderDetailsGrantRefundQuery,
   useOrderGrantRefundEditMutation,
   useOrderSendRefundForGrantedRefundMutation,
@@ -14,6 +15,15 @@ import OrderTransactionRefundPage, {
 } from "@dashboard/orders/components/OrderTransactionRefundPage/OrderTransactionRefundPage";
 import { orderUrl } from "@dashboard/orders/urls";
 import React, { useState } from "react";
+import { useIntl } from "react-intl";
+
+import {
+  checkAmountExceedsChargedAmount,
+  handleAmountExceedsChargedAmount,
+  prepareRefundAddLines,
+} from "../OrderTransactionRefundCreate/handlers";
+import { handleRefundEditComplete } from "./handlers";
+import { transactionRefundEditMessages } from "./messages";
 
 interface OrderTransactionRefundProps {
   orderId: string;
@@ -23,6 +33,7 @@ interface OrderTransactionRefundProps {
 const OrderTransactionRefund: React.FC<OrderTransactionRefundProps> = ({ orderId, refundId }) => {
   const notify = useNotifier();
   const navigate = useNavigator();
+  const intl = useIntl();
 
   const [linesErrors, setLinesErrors] = useState<OrderTransactionRefundError[]>([]);
 
@@ -35,13 +46,15 @@ const OrderTransactionRefund: React.FC<OrderTransactionRefundProps> = ({ orderId
 
   const [updateRefund, updateRefundOpts] = useOrderGrantRefundEditMutation({
     onCompleted: submitData => {
-      if (submitData.orderGrantRefundUpdate?.errors.length === 0) {
-        notify({
-          status: "success",
-          text: "Saved draft",
-        });
-      }
+      handleRefundEditComplete({
+        submitData,
+        notify,
+        setLinesErrors,
+        intl,
+        orderId,
+      });
     },
+    disableErrorHandling: true,
     update(cache, { data }) {
       if (data?.orderGrantRefundUpdate?.errors?.length === 0) {
         cache.writeQuery({
@@ -59,30 +72,38 @@ const OrderTransactionRefund: React.FC<OrderTransactionRefundProps> = ({ orderId
       return;
     }
 
+    if (submitData.amount === 0) {
+      setLinesErrors([
+        {
+          code: OrderGrantRefundUpdateErrorCode.REQUIRED,
+          field: "amount",
+          message: intl.formatMessage(transactionRefundEditMessages.noAmountError),
+          lines: [],
+        },
+      ]);
+
+      return;
+    }
+
     const { amount, reason, linesToRefund, includeShipping, transactionId } = submitData;
 
-    const dirtyLinesToRefund = linesToRefund.filter(item => item.isDirty);
+    if (
+      checkAmountExceedsChargedAmount({
+        amount,
+        order: data.order,
+        transactionId,
+      })
+    ) {
+      handleAmountExceedsChargedAmount({ setLinesErrors, intl });
 
-    const toAdd = dirtyLinesToRefund.map(line => ({
-      quantity: line.quantity,
-      reason: line.reason,
-      id: data.order!.lines[line.row].id,
-    }));
+      return;
+    }
 
-    const toRemove =
-      draftRefund.lines?.reduce<string[]>((acc, line) => {
-        dirtyLinesToRefund.forEach(qty => {
-          const orderLine = data.order!.lines[qty.row];
+    const draftRefundLines = draftRefund.lines ?? [];
+    const toRemove = draftRefundLines.map(line => line.id);
+    const toAdd = prepareRefundAddLines({ linesToRefund, data });
 
-          if (line.orderLine.id === orderLine.id && !acc.includes(line.id)) {
-            acc.push(line.id);
-          }
-        });
-
-        return acc;
-      }, []) ?? [];
-
-    const result = await updateRefund({
+    updateRefund({
       variables: {
         refundId,
         amount,
@@ -93,19 +114,6 @@ const OrderTransactionRefund: React.FC<OrderTransactionRefundProps> = ({ orderId
         transactionId,
       },
     });
-
-    const errors = result.data?.orderGrantRefundUpdate?.errors;
-
-    if (errors?.length) {
-      setLinesErrors(
-        errors.map(err => ({
-          code: err.code,
-          field: err.field,
-          message: err.message,
-          lines: err.addLines,
-        })) as OrderTransactionRefundError[],
-      );
-    }
   };
 
   const draftRefund: OrderDetailsGrantRefundFragment["grantedRefunds"][0] | undefined =

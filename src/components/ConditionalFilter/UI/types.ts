@@ -25,6 +25,7 @@ type ConditionOptionTypes = ConditionOption<
   | "text"
   | "number"
   | "multiselect"
+  | "bulkselect"
   | "combobox"
   | "select"
   | "number.range"
@@ -52,6 +53,7 @@ export interface Row {
 export type SelectedOperator =
   | InputOperator
   | MultiselectOperator
+  | BulkselectOperator
   | ComboboxOperator
   | SelectOperator
   | NumberRangeOperator
@@ -61,13 +63,20 @@ export type SelectedOperator =
   | DateTimeRangeOperator;
 
 export interface InputOperator {
-  value: string;
+  value: string | RightOperatorOption;
   conditionValue: ConditionOption<"text" | "number"> | null;
 }
 
 export interface MultiselectOperator {
   value: RightOperatorOption[];
   conditionValue: ConditionOption<"multiselect"> | null;
+  options: RightOperatorOption[];
+  loading?: boolean;
+}
+
+export interface BulkselectOperator {
+  value: RightOperatorOption[];
+  conditionValue: ConditionOption<"bulkselect"> | null;
   options: RightOperatorOption[];
   loading?: boolean;
 }

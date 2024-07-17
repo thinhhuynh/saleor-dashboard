@@ -37,13 +37,13 @@ export const ATTRIBUTES = {
     },
   ],
   attributeTypesWithAbilityToAddValues: {
-    names: ["DROPDOWN", "MULTISELECT", "SWATCH"],
+    names: ["Dropdown", "Multiple Select", "Swatch"],
   },
   attributeTypesWithoutAbilityToAddValues: {
-    names: ["FILE", "NUMERIC", "RICH_TEXT", "PLAIN_TEXT", "BOOLEAN", "DATE", "DATE_TIME"],
+    names: ["File", "Numeric", "Rich Text", "Plain Text", "Boolean", "Date", "Date Time"],
   },
   attributeReferencesEntities: {
-    names: ["PAGE", "PRODUCT", "PRODUCT_VARIANT"],
+    names: ["Page", "Product", "Product Variant"],
   },
   attributeToBeAssignedToPageType: {
     name: "Attribute to be assigned to page type",
@@ -432,6 +432,56 @@ export const ORDERS = {
   orderNotFulfilledToChangeShippingAddress: {
     id: "T3JkZXI6ZWFhZjA0MzgtNzkyYi00ZTdlLWIyODUtMTBkMjViMjM0MzRk",
   },
+  fullyPaidOrderWithSingleTransaction: {
+    id: "T3JkZXI6ZjZjZWUxMzItNDk2Zi00MWUyLWJkNTItYTk1MDM1YTVlZmVm",
+    lineItems: [
+      {
+        name: "Bean Juice",
+        quantity: "1",
+      },
+      { name: "Lake Tunes", quantity: "2" },
+    ],
+  },
+  fullyPaidOrderWithSeveralTransactions: {
+    id: "T3JkZXI6MTVhYTEwMzYtZWE3OS00MzJiLTliODctNDhlYTMwYmU1NmNl",
+    transactionToRefundId:
+      "VHJhbnNhY3Rpb25JdGVtOjExNzQxZmQ3LWJkZjAtNDIxNi1hNTVkLTFkZDhiNTk4YTA5Mw==",
+  },
+  partiallyPaidOrder: {
+    id: "T3JkZXI6NmVlMDMwMTctZTViOS00OGNmLWFkYTQtODg4YTQ5MDI3ZjNk",
+  },
+  orderWithRefundsInStatusOtherThanSuccess: {
+    id: "T3JkZXI6YzI4YjFmYmEtZWU1NS00YmU5LTg5MjktNTMyYzk5MDlkZGVk",
+    lineItems: [
+      { name: "Blue Hoodie 2", quantity: "1" },
+      { name: "Black Hoodie", quantity: "1" },
+      { name: "Mustard Hoodie", quantity: "1" },
+      { name: "White Hoodie", quantity: "1" },
+    ],
+    refunds: [
+      {
+        id: "T3JkZXJHcmFudGVkUmVmdW5kOjEw",
+        status: "FAILURE",
+      },
+      {
+        id: "T3JkZXJHcmFudGVkUmVmdW5kOjg%3D",
+        status: "DRAFT",
+      },
+    ],
+  },
+  orderWithRefunds: {
+    id: "T3JkZXI6Y2YyY2EwNWYtZmQ3Yy00ODk5LThjZTktMzQ4NjYxYThjZDkx",
+    refunds: [
+      {
+        lineOrderRefundId: "T3JkZXJHcmFudGVkUmVmdW5kOjE=",
+        amount: 4.5,
+      },
+      {
+        manualRefundId: "",
+        amount: 22.0,
+      },
+    ],
+  },
 };
 
 export const SHIPPING_METHODS = {
@@ -501,6 +551,18 @@ export const USERS = {
     info: "User used in change password test",
     name: "change password",
     lastName: "user",
+  },
+  staffToBeEdited: {
+    id: "VXNlcjoxMzcx",
+    name: "e2e_staff_to_be_updated",
+    lastName: "DO NOT DELETE",
+    email: "test123@hotmail.com",
+    permission: "Apps management",
+  },
+  staffToBeDeleted: {
+    id: "VXNlcjoxMzcy",
+    name: "e2e_staff_to_be_deleted",
+    lastName: "DO NOT DELETE",
   },
 };
 

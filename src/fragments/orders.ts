@@ -529,6 +529,7 @@ export const transactionItemFragment = gql`
     ...TransactionBaseItem
     pspReference
     externalUrl
+    createdAt
     events {
       ...TransactionEvent
     }
@@ -636,6 +637,13 @@ export const fragmentOrderGrantedRefunds = gql`
     app {
       id
       name
+    }
+    lines {
+      id
+      quantity
+      orderLine {
+        id
+      }
     }
   }
 `;

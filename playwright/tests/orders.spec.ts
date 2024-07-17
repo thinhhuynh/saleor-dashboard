@@ -6,6 +6,7 @@ import { DraftOrdersPage } from "@pages/draftOrdersPage";
 import { AddressForm } from "@pages/forms/addressForm";
 import { FulfillmentPage } from "@pages/fulfillmentPage";
 import { OrdersPage } from "@pages/ordersPage";
+import { RefundPage } from "@pages/refundPage";
 import { expect, test } from "@playwright/test";
 
 test.use({ storageState: "./playwright/.auth/admin.json" });
@@ -16,6 +17,7 @@ let fulfillmentPage: FulfillmentPage;
 let addressDialog: AddressDialog;
 let addressForm: AddressForm;
 let addressesListPage: AddressesListPage;
+let refundPage: RefundPage;
 
 test.beforeEach(({ page }) => {
   ordersPage = new OrdersPage(page);
@@ -24,6 +26,7 @@ test.beforeEach(({ page }) => {
   addressDialog = new AddressDialog(page);
   addressesListPage = new AddressesListPage(page);
   addressForm = new AddressForm(page);
+  refundPage = new RefundPage(page);
 });
 
 const variantSKU = PRODUCTS.productAvailableWithTransactionFlow.variant1sku;
@@ -84,6 +87,8 @@ test("TC: SALEOR_77 Mark order as paid and fulfill it with transaction flow acti
 test("TC: SALEOR_78 Capture partial amounts by manual transactions and fulfill order with transaction flow activated @e2e @order", async () => {
   const firstManualTransactionAmount = "100";
   const secondManualTransactionAmount = "20";
+
+  test.slow();
 
   await ordersPage.goToExistingOrderPage(
     ORDERS.ordersWithinTransactionFlow.captureManualTransactionOrder.orderId,
@@ -180,8 +185,6 @@ test("TC: SALEOR_81 Change billing address in fulfilled order @e2e @order", asyn
 
   await ordersPage.expectSuccessBanner();
 
-  await ordersPage.expectSuccessBanner();
-
   await addressesListPage.verifyRequiredAddressFields(newAddress.firstName, newAddress);
   await addressesListPage.verifyPhoneField(newAddress.firstName, newAddress);
   await addressesListPage.verifyCompanyField(newAddress.firstName, newAddress);
@@ -230,6 +233,7 @@ test("TC: SALEOR_83 Draft orders bulk delete @e2e @draft", async () => {
 });
 
 test("TC: SALEOR_84 Create draft order @e2e @draft", async () => {
+  test.slow();
   await draftOrdersPage.goToDraftOrdersListView();
   await draftOrdersPage.clickCreateDraftOrderButton();
   await draftOrdersPage.draftOrderCreateDialog.completeDraftOrderCreateDialogWithFirstChannel();
@@ -242,9 +246,92 @@ test("TC: SALEOR_84 Create draft order @e2e @draft", async () => {
   await draftOrdersPage.rightSideDetailsPage.clickEditCustomerButton();
   await draftOrdersPage.rightSideDetailsPage.clickSearchCustomerInput();
   await draftOrdersPage.rightSideDetailsPage.selectCustomer();
+  await draftOrdersPage.expectSuccessBanner();
   await draftOrdersPage.addressDialog.clickConfirmButton();
+  await draftOrdersPage.expectSuccessBanner();
   await draftOrdersPage.clickAddShippingCarrierButton();
   await draftOrdersPage.shippingAddressDialog.pickAndConfirmFirstShippingMethod();
+  await draftOrdersPage.expectSuccessBanner();
   await draftOrdersPage.clickFinalizeButton();
   await draftOrdersPage.expectSuccessBannerMessage("finalized");
 });
+
+test("TC: SALEOR_191 Refund products from the fully paid order @e2e @refunds", async () => {
+  const order = ORDERS.fullyPaidOrderWithSingleTransaction;
+
+  await ordersPage.goToExistingOrderPage(order.id);
+  await ordersPage.clickAddRefundButton();
+  await ordersPage.orderRefundDialog.pickLineItemsRefund();
+  await ordersPage.orderRefundModal.waitFor({ state: "hidden" });
+  await refundPage.expectAddLineItemsRefundPageOpen(order.id);
+  await refundPage.pickAllProductQuantityToRefund(order.lineItems[0].name);
+
+  const productRow = await refundPage.getProductRow(order.lineItems[0].name);
+
+  expect(productRow.locator(refundPage.productQuantityInput)).toHaveValue(
+    order.lineItems[0].quantity,
+  );
+
+  const refundReason = "Expectations not met";
+
+  await refundPage.inputProductLineQuantity(order.lineItems[1].name, "1");
+  await refundPage.clickLineRefundReasonButton(order.lineItems[0].name);
+  await refundPage.addLineRefundReasonDialog.provideLineRefundReason("Item is damaged");
+  await refundPage.addLineRefundReasonDialog.submitLineRefundReason();
+  await refundPage.provideRefundReason(refundReason);
+  await refundPage.saveDraft();
+  await refundPage.expectSuccessBanner();
+  await ordersPage.goToExistingOrderPage(order.id);
+  await ordersPage.orderRefundSection.waitFor({ state: "visible" });
+  await ordersPage.assertRefundOnList(refundReason);
+  await ordersPage.clickEditRefundButton(refundReason);
+  await refundPage.transferFunds();
+  await refundPage.expectSuccessBannerMessage("Refund has been sent");
+});
+
+test("TC: SALEOR_192 Should create a manual refund with a custom amount @e2e @refunds", async () => {
+  const order = ORDERS.fullyPaidOrderWithSeveralTransactions;
+
+  await ordersPage.goToExistingOrderPage(order.id);
+  await ordersPage.clickAddRefundButton();
+  await ordersPage.orderRefundDialog.pickManualRefund();
+  await ordersPage.orderRefundModal.waitFor({ state: "hidden" });
+  await refundPage.expectManualRefundPageOpen(order.id);
+  await refundPage.selectTransactionToRefund(order.transactionToRefundId);
+  await refundPage.transferFunds();
+  await refundPage.expectErrorMessage("You must provide amount value");
+  await refundPage.provideRefundAmount("1000");
+  await refundPage.expectErrorMessage(
+    "Provided amount cannot exceed charged amount for the selected transaction",
+  );
+  await refundPage.provideRefundAmount("10");
+  await refundPage.transferFunds();
+  await refundPage.expectSuccessBannerMessage("Transaction action requested successfully");
+  await ordersPage.goToExistingOrderPage(order.id);
+  await ordersPage.orderRefundSection.waitFor({ state: "visible" });
+  await ordersPage.assertRefundOnList("Manual refund");
+});
+
+const orderRefunds = ORDERS.orderWithRefundsInStatusOtherThanSuccess.refunds;
+
+for (const refund of orderRefunds) {
+  test(`TC: SALEOR_193 Update order with non-manual refund in ${refund.status} status @e2e @refunds`, async () => {
+    await ordersPage.goToExistingOrderPage(ORDERS.orderWithRefundsInStatusOtherThanSuccess.id);
+    await ordersPage.orderRefundList.scrollIntoViewIfNeeded();
+
+    const orderRefundListRow = await ordersPage.orderRefundList.locator("tr");
+    const pendingRefunds = await orderRefundListRow.filter({ hasText: "PENDING" }).all();
+
+    for (const pendingRefund of pendingRefunds) {
+      await expect(pendingRefund.locator(ordersPage.editRefundButton)).toBeDisabled();
+    }
+    await ordersPage.clickEditRefundButton(refund.status);
+    await refundPage.expectEditLineItemsRefundPageOpen(
+      ORDERS.orderWithRefundsInStatusOtherThanSuccess.id,
+      refund.id,
+    );
+    await refundPage.transferFunds();
+    await refundPage.expectSuccessBanner();
+    await expect(ordersPage.orderRefundList).not.toContainText(refund.status);
+  });
+}

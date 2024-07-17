@@ -6,6 +6,20 @@ import { slugFromConditionValue } from "../FilterElement/ConditionValue";
 
 export const CONDITIONS = ["is", "equals", "in", "between", "lower", "greater"];
 
+const ORDER_STATICS = [
+  "paymentStatus",
+  "status",
+  "authorizeStatus",
+  "chargeStatus",
+  "giftCardBought",
+  "giftCardUsed",
+  "isPreorder",
+  "isClickAndCollect",
+  "channels",
+  "customer",
+  "ids",
+];
+
 const STATIC_TO_LOAD = [
   "category",
   "collection",
@@ -16,6 +30,7 @@ const STATIC_TO_LOAD = [
   "isVisibleInListing",
   "hasCategory",
   "giftCard",
+  ...ORDER_STATICS,
 ];
 
 export const TokenType = {

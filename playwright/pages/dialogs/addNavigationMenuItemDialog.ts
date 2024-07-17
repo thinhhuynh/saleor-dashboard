@@ -15,12 +15,26 @@ export class AddNavigationMenuItemDialog extends BasePage {
   }
 
   async selectLinkOption(option: string, optionName: string) {
-    await this.linkSelect.fill(optionName);
-    await expect(this.menuLinkOptions.getByTestId(option)).toBeEnabled({
-      timeout: 60000,
-    });
-    await this.page.getByTestId(option).click({ force: true });
-    await this.menuLinkOptions.getByText(optionName).click({ force: true });
+    await this.linkSelect.click();
+    await this.waitForDOMToFullyLoad();
+    await this.menuLinkOptions.waitFor({ state: "attached" });
+    await this.menuLinkOptions
+      .getByRole("option", { name: "Categories" })
+      .waitFor({ state: "visible" });
+    await this.menuLinkOptions
+      .getByRole("option", { name: "Collections" })
+      .waitFor({ state: "visible" });
+    await this.menuLinkOptions.getByRole("option", { name: "Pages" }).waitFor({ state: "visible" });
+    await expect(this.menuLinkOptions.getByRole("option", { name: "Categories" })).toBeEnabled();
+    await this.menuLinkOptions.getByTestId(option).click({ force: true });
+    await this.waitForDOMToFullyLoad();
+    await this.menuLinkOptions
+      .getByRole("option", { name: optionName })
+      .waitFor({ state: "visible" });
+    expect(this.menuLinkOptions.getByRole("option", { name: optionName })).toBeEnabled();
+    await this.menuLinkOptions.getByRole("option", { name: optionName }).click({ force: true });
+    await this.waitForDOMToFullyLoad();
+    await expect(this.linkSelect).toHaveValue(optionName);
   }
 
   async typeMenuItemName(name: string) {
@@ -29,5 +43,6 @@ export class AddNavigationMenuItemDialog extends BasePage {
 
   async clickSaveButton() {
     await this.saveButton.click();
+    await this.waitForDOMToFullyLoad();
   }
 }

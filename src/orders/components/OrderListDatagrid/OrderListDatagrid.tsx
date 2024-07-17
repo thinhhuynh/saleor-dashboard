@@ -53,6 +53,7 @@ export const OrderListDatagrid: React.FC<OrderListDatagridProps> = ({
     [emptyColumn, intl, sort],
   );
   const { handlers, staticColumns, visibleColumns, selectedColumns } = useColumns({
+    gridName: "order_list",
     staticColumns: memoizedStaticColumns,
     selectedColumns: settings?.columns ?? [],
     onSave: handleColumnChange,
@@ -106,7 +107,7 @@ export const OrderListDatagrid: React.FC<OrderListDatagridProps> = ({
           columnSelect="single"
           hasRowHover={hasRowHover}
           freezeColumns={2}
-          verticalBorder={col => col > 1}
+          verticalBorder={false}
           availableColumns={visibleColumns}
           onHeaderClicked={handleHeaderClick}
           emptyText={intl.formatMessage(messages.emptyText)}
@@ -124,7 +125,6 @@ export const OrderListDatagrid: React.FC<OrderListDatagridProps> = ({
               onToggle={handlers.onToggle}
             />
           )}
-          fullScreenTitle={intl.formatMessage(messages.orders)}
           onRowClick={handleRowClick}
           rowAnchor={handleRowAnchor}
         />

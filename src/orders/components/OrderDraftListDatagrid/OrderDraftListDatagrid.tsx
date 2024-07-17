@@ -53,6 +53,7 @@ export const OrderDraftListDatagrid = ({
     [intl, sort],
   );
   const { handlers, staticColumns, visibleColumns, selectedColumns } = useColumns({
+    gridName: "order_drafts_list",
     staticColumns: memoizedStaticColumns,
     selectedColumns: settings?.columns ?? [],
     onSave: handleColumnChange,
@@ -102,7 +103,7 @@ export const OrderDraftListDatagrid = ({
         hasRowHover={hasRowHover}
         loading={disabled}
         availableColumns={visibleColumns}
-        verticalBorder={col => col > 0}
+        verticalBorder={false}
         getCellContent={getCellContent}
         getCellError={() => false}
         menuItems={() => []}

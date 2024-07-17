@@ -4,11 +4,13 @@ import {
   CountryCode,
   DateRangeInput,
   OrderStatus,
+  OrderStatusFilter,
   PaymentChargeStatusEnum,
 } from "@dashboard/graphql";
 import { Node, SlugNode } from "@dashboard/types";
 import { ThemeType } from "@saleor/macaw-ui";
 import { DefaultTheme, ThemeTokensValues } from "@saleor/macaw-ui-next";
+import Fuse from "fuse.js";
 import uniqBy from "lodash/uniqBy";
 import moment from "moment-timezone";
 import { IntlShape } from "react-intl";
@@ -168,6 +170,16 @@ export const transformOrderStatus = (
     case OrderStatus.RETURNED:
       return {
         localized: intl.formatMessage(orderStatusMessages.returned),
+        status: StatusType.INFO,
+      };
+    case OrderStatusFilter.READY_TO_CAPTURE:
+      return {
+        localized: intl.formatMessage(orderStatusMessages.readyToCapture),
+        status: StatusType.INFO,
+      };
+    case OrderStatusFilter.READY_TO_FULFILL:
+      return {
+        localized: intl.formatMessage(orderStatusMessages.readyToFulfill),
         status: StatusType.INFO,
       };
   }
@@ -335,7 +347,7 @@ export const parseLogMessage = ({
   });
 };
 
-interface User {
+export interface User {
   email: string;
   firstName?: string;
   lastName?: string;
@@ -622,3 +634,17 @@ const getAllRemovedRowsBeforeRowIndex = (rowIndex: number, removedRowsIndexs: nu
 
 export const getDatagridRowDataIndex = (rowIndex: number, removedRowsIndexs: number[]) =>
   rowIndex + getAllRemovedRowsBeforeRowIndex(rowIndex, removedRowsIndexs).length;
+
+export const fuzzySearch = <T>(array: T[], query: string | undefined, keys: string[]) => {
+  if (!query) {
+    return array;
+  }
+
+  const fuse = new Fuse(array, {
+    keys,
+    includeScore: true,
+    threshold: 0.3,
+  });
+
+  return fuse.search(query.toLocaleLowerCase()).map(({ item }) => item);
+};

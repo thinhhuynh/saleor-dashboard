@@ -26,6 +26,7 @@ export class BasePage {
     readonly searchInputListView = page.getByTestId("search-input"),
     readonly emptyDataGridListView = page.getByTestId("empty-data-grid-text"),
     readonly dialog = page.getByRole("dialog"),
+    readonly submitButton = page.getByTestId("submit"),
     readonly giftCardInTable = page.locator('[href*="/dashboard/gift-cards/.*]'),
     readonly selectAllCheckbox = page.getByTestId("select-all-checkbox").locator("input"),
   ) {
@@ -63,11 +64,16 @@ export class BasePage {
     await this.deleteButton.click();
   }
 
+  async clickSubmitButton() {
+    await this.submitButton.click();
+  }
+
   async typeInSearchOnListView(searchItem: string) {
-    await this.waitForNetworkIdle(async () => {
+    await this.waitForNetworkIdleAfterAction(async () => {
       await this.searchInputListView.fill(searchItem);
-      await this.waitForDOMToFullyLoad();
     });
+    await expect(this.searchInputListView).toHaveValue(searchItem);
+    await this.waitForDOMToFullyLoad();
   }
 
   async clickNextPageButton() {
@@ -113,13 +119,22 @@ export class BasePage {
     await expect(this.errorBanner, "No error banner should be visible").not.toBeVisible();
   }
 
-  async waitForNetworkIdle(action: () => Promise<void>, timeoutMs = 60000) {
+  async waitForNetworkIdleAfterAction(action: () => Promise<void>, timeoutMs = 90000) {
     const responsePromise = this.page.waitForResponse("**/graphql/", {
       timeout: timeoutMs,
     });
 
     await action();
     await responsePromise;
+  }
+
+  async waitForRequestsToFinishBeforeAction(action: () => Promise<void>, timeoutMs = 90000) {
+    const responsePromise = this.page.waitForResponse("**/graphql/", {
+      timeout: timeoutMs,
+    });
+
+    await responsePromise;
+    await action();
   }
 
   async resizeWindow(w: number, h: number) {
@@ -143,8 +158,8 @@ export class BasePage {
       .waitFor({ state: "attached", timeout: 50000 });
   }
 
-  private async findGridCellBounds(col: number, row: number) {
-    return this.gridCanvas.evaluate(
+  private async findGridCellBounds(col: number, row: number, nthChild = 0) {
+    return this.gridCanvas.nth(nthChild).evaluate(
       (node, { col, row }) => {
         const fiberKey = Object.keys(node).find(x => x && x.includes("__reactFiber"));
 
@@ -177,6 +192,8 @@ export class BasePage {
     rowsToCheck: number[],
     listToCheck: string[],
   ) {
+    await this.waitForDOMToFullyLoad();
+
     const searchResults = [];
 
     for (let i = 0; i < rowsToCheck.length; i++) {
@@ -199,8 +216,8 @@ export class BasePage {
       await basePage.fillGridCell(1, 0, "New variant name")
   */
 
-  async fillGridCell(col: number, row: number, content: string) {
-    const bounds = await this.findGridCellBounds(col, row);
+  async fillGridCell(col: number, row: number, content: string, nthChild = 0) {
+    const bounds = await this.findGridCellBounds(col, row, nthChild);
 
     if (!bounds) throw new Error(`Unable to find cell, col: ${col}, row: ${row}`);
 
@@ -209,8 +226,8 @@ export class BasePage {
     await this.gridInput.fill(content);
   }
 
-  async clickGridCell(col: number, row: number) {
-    const bounds = await this.findGridCellBounds(col, row);
+  async clickGridCell(col: number, row: number, nthChild = 0) {
+    const bounds = await this.findGridCellBounds(col, row, nthChild);
 
     if (!bounds) throw new Error(`Unable to find cell, col: ${col}, row: ${row}`);
 
@@ -218,23 +235,34 @@ export class BasePage {
   }
 
   async findRowIndexBasedOnText(searchTextArray: string[]) {
+    await this.waitForDOMToFullyLoad();
+
     await this.gridCanvas.locator("table tr").first().waitFor({ state: "attached" });
+
+    await this.page.waitForSelector("table tr", { state: "attached" });
+
+    const rows = await this.page.locator("table tr").allTextContents();
 
     const rowIndexes: number[] = [];
 
-    const rows = await this.page.$$eval("table tr", rows => rows.map(row => row.textContent));
-
     for (const searchedText of searchTextArray) {
-      const rowIndex = rows.findIndex(rowText => rowText!.includes(searchedText));
+      const rowIndex = rows.findIndex(rowText => rowText.includes(searchedText));
 
       if (rowIndex !== -1) {
         console.log("Index of row containing text:", rowIndex - 1);
-        // since row index starts with 1 and selecting cells in grid starts with zero there is -1 on rowIndex
         rowIndexes.push(rowIndex - 1);
       }
     }
 
     return rowIndexes;
+  }
+
+  async searchAndFindRowIndexes(searchItem: string) {
+    await this.typeInSearchOnListView(searchItem);
+
+    await this.page.waitForTimeout(1000);
+
+    return await this.findRowIndexBasedOnText([searchItem]);
   }
 
   // check row on grid list view
@@ -287,6 +315,7 @@ export class BasePage {
 
   async waitForDOMToFullyLoad() {
     await this.page.waitForLoadState("domcontentloaded", { timeout: 70000 });
+    await this.loader.waitFor({ state: "hidden" });
   }
 
   async expectElementIsHidden(locator: Locator) {

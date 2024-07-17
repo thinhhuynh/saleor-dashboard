@@ -52,6 +52,7 @@ export const CategoryListDatagrid = ({
     [onUpdateListSettings],
   );
   const { handlers, selectedColumns, staticColumns, visibleColumns } = useColumns({
+    gridName: "category_list",
     staticColumns: memoizedStaticColumns,
     selectedColumns: settings?.columns ?? [],
     onSave: handleColumnChange,
@@ -80,7 +81,7 @@ export const CategoryListDatagrid = ({
         hasRowHover={hasRowHover}
         loading={disabled}
         columnSelect={sort !== undefined ? "single" : undefined}
-        verticalBorder={col => col > 0}
+        verticalBorder={false}
         rowMarkers="checkbox-visible"
         availableColumns={visibleColumns}
         rows={categories?.length ?? 0}

@@ -2,13 +2,14 @@
 import AddressFormatter from "@dashboard/components/AddressFormatter";
 import { Button } from "@dashboard/components/Button";
 import CardTitle from "@dashboard/components/CardTitle";
+import { Combobox } from "@dashboard/components/Combobox";
 import ExternalLink from "@dashboard/components/ExternalLink";
 import Form from "@dashboard/components/Form";
 import Hr from "@dashboard/components/Hr";
 import Link from "@dashboard/components/Link";
 import RequirePermissions from "@dashboard/components/RequirePermissions";
-import SingleAutocompleteSelectField from "@dashboard/components/SingleAutocompleteSelectField";
 import Skeleton from "@dashboard/components/Skeleton";
+import { useFlag } from "@dashboard/featureFlags";
 import {
   OrderDetailsFragment,
   OrderErrorCode,
@@ -18,7 +19,7 @@ import {
 } from "@dashboard/graphql";
 import useStateFromProps from "@dashboard/hooks/useStateFromProps";
 import { buttonMessages } from "@dashboard/intl";
-import { orderListUrl } from "@dashboard/orders/urls";
+import { ff_orderListUrl, orderListUrl } from "@dashboard/orders/urls";
 import { FetchMoreProps, RelayToFlat } from "@dashboard/types";
 import createSingleAutocompleteSelectHandler from "@dashboard/utils/handlers/singleAutocompleteSelectChangeHandler";
 import { Card, CardContent, Typography } from "@material-ui/core";
@@ -84,6 +85,8 @@ const OrderCustomer: React.FC<OrderCustomerProps> = props => {
     error => error.code === OrderErrorCode.ORDER_NO_SHIPPING_ADDRESS,
   );
 
+  const { enabled: orderFiltersEnabled } = useFlag("order_filters");
+
   return (
     <Card>
       <CardTitle
@@ -118,6 +121,10 @@ const OrderCustomer: React.FC<OrderCustomerProps> = props => {
 
                 const value = event.target.value;
 
+                if (!value) {
+                  return;
+                }
+
                 onCustomerEdit({
                   prevUser: user?.id,
                   prevUserEmail: userEmail,
@@ -136,22 +143,26 @@ const OrderCustomer: React.FC<OrderCustomerProps> = props => {
               );
 
               return (
-                <SingleAutocompleteSelectField
+                <Combobox
                   data-test-id="select-customer"
                   allowCustomValues={true}
-                  choices={userChoices}
-                  displayValue={userDisplayName}
-                  fetchChoices={fetchUsers}
-                  hasMore={hasMoreUsers}
-                  loading={loading}
-                  placeholder={intl.formatMessage({
+                  label={intl.formatMessage({
                     id: "hkSkNx",
                     defaultMessage: "Search Customers",
                   })}
-                  onChange={handleUserChange}
-                  onFetchMore={onFetchMoreUsers}
+                  options={userChoices}
+                  fetchMore={{
+                    onFetchMore: onFetchMoreUsers,
+                    hasMore: hasMoreUsers,
+                    loading: loading,
+                  }}
+                  fetchOptions={fetchUsers}
                   name="query"
-                  value={data.query}
+                  value={{
+                    label: userDisplayName,
+                    value: data.query,
+                  }}
+                  onChange={handleUserChange}
                 />
               );
             }}
@@ -167,9 +178,13 @@ const OrderCustomer: React.FC<OrderCustomerProps> = props => {
               <div>
                 <Link
                   underline={false}
-                  href={orderListUrl({
-                    customer: userEmail,
-                  })}
+                  href={
+                    orderFiltersEnabled
+                      ? ff_orderListUrl(userEmail)
+                      : orderListUrl({
+                          customer: userEmail,
+                        })
+                  }
                 >
                   <FormattedMessage id="J4NBVR" defaultMessage="View Orders" description="link" />
                 </Link>
