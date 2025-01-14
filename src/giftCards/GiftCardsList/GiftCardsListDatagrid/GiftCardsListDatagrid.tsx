@@ -8,6 +8,7 @@ import {
 import TablePagination from "@dashboard/components/TablePagination";
 import { commonTooltipMessages } from "@dashboard/components/TooltipTableCellHeader/messages";
 import { giftCardListUrl, giftCardUrl } from "@dashboard/giftCards/urls";
+import { getPrevLocationState } from "@dashboard/hooks/useBackLinkWithState";
 import useNavigator from "@dashboard/hooks/useNavigator";
 import usePaginator from "@dashboard/hooks/usePaginator";
 import { Item } from "@glideapps/glide-data-grid";
@@ -15,6 +16,7 @@ import { Box, useTheme } from "@saleor/macaw-ui-next";
 import isEqual from "lodash/isEqual";
 import React, { useCallback, useEffect, useMemo } from "react";
 import { useIntl } from "react-intl";
+import { useLocation } from "react-router";
 
 import { messages as filterLabels } from "../filters";
 import { useGiftCardList } from "../providers/GiftCardListProvider";
@@ -26,6 +28,7 @@ import { messages } from "./messages";
 export const GiftCardsListDatagrid = () => {
   const datagridState = useDatagridChangeState();
   const navigate = useNavigator();
+  const location = useLocation();
   const intl = useIntl();
   const {
     loading,
@@ -169,6 +172,7 @@ export const GiftCardsListDatagrid = () => {
             onToggle={handlers.onToggle}
           />
         )}
+        navigatorOpts={{ state: getPrevLocationState(location) }}
       />
 
       <Box paddingX={6}>

@@ -1,14 +1,18 @@
 import { Actions } from "./Actions";
 import { Close } from "./Close";
-import { Content } from "./Content";
+import { Content, ContentSize } from "./Content";
+import { Grid } from "./Grid";
+import { Header } from "./Header";
 import { Root } from "./Root";
 import { Title } from "./Title";
 
-export const DASHBOARD_MODAL_WIDTH = 600;
+export type DashboardModalContentSize = ContentSize;
 
 export const DashboardModal = Object.assign(Root, {
   Title,
   Content,
   Actions,
   Close,
+  Grid,
+  Header,
 });

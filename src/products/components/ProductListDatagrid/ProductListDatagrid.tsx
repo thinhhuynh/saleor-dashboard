@@ -16,6 +16,7 @@ import {
   ProductListQuery,
   useAvailableColumnAttributesLazyQuery,
 } from "@dashboard/graphql";
+import { getPrevLocationState } from "@dashboard/hooks/useBackLinkWithState";
 import useLocale from "@dashboard/hooks/useLocale";
 import { ProductListUrlSortField } from "@dashboard/products/urls";
 import { canBeSorted } from "@dashboard/products/views/ProductList/sort";
@@ -25,6 +26,7 @@ import { Item } from "@glideapps/glide-data-grid";
 import { Box, useTheme } from "@saleor/macaw-ui-next";
 import React, { useCallback, useMemo } from "react";
 import { useIntl } from "react-intl";
+import { useLocation } from "react-router";
 
 import { getAttributeIdFromColumnValue, isAttributeColumnValue } from "../ProductListPage/utils";
 import {
@@ -85,6 +87,7 @@ export const ProductListDatagrid: React.FC<ProductListDatagridProps> = ({
   const { theme } = useTheme();
   const datagrid = useDatagridChangeState();
   const { locale } = useLocale();
+  const location = useLocation();
   const productsLength = getProductRowsLength(disabled, products, disabled);
   const onPriceClick = usePriceClick({ isChannelSelected });
 
@@ -184,9 +187,9 @@ export const ProductListDatagrid: React.FC<ProductListDatagridProps> = ({
       const action = getCellAction(visibleColumns, col);
 
       if (action) {
-        action(products[row].id);
+        const result = action(products[row].id);
 
-        return;
+        if (result) return;
       }
 
       const rowData = products[row];
@@ -275,6 +278,7 @@ export const ProductListDatagrid: React.FC<ProductListDatagridProps> = ({
               onToggle={handlers.onToggle}
             />
           )}
+          navigatorOpts={{ state: getPrevLocationState(location) }}
         />
 
         <Box paddingX={6}>

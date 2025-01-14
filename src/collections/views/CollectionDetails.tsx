@@ -33,9 +33,7 @@ import useProductSearch from "@dashboard/searches/useProductSearch";
 import { arrayDiff } from "@dashboard/utils/arrays";
 import createDialogActionHandlers from "@dashboard/utils/handlers/dialogActionHandlers";
 import createMetadataUpdateHandler from "@dashboard/utils/handlers/metadataUpdateHandler";
-import { mapEdgesToItems } from "@dashboard/utils/maps";
 import { getParsedDataForJsonStringField } from "@dashboard/utils/richText/misc";
-import { DialogContentText } from "@material-ui/core";
 import React from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 
@@ -48,7 +46,7 @@ import {
   CollectionUrlDialog,
   CollectionUrlQueryParams,
 } from "../urls";
-import { getAssignedProductIdsToCollection } from "../utils";
+import { getAssignedProductIdsToCollection, getProductsFromSearchResults } from "../utils";
 import { COLLECTION_DETAILS_FORM_ID } from "./consts";
 
 interface CollectionDetailsProps {
@@ -343,9 +341,7 @@ export const CollectionDetails: React.FC<CollectionDetailsProps> = ({ id, params
         loading={result.loading}
         onClose={closeModal}
         onSubmit={handleAssignationChange}
-        products={mapEdgesToItems(result?.data?.search)?.filter(
-          suggestedProduct => suggestedProduct.id,
-        )}
+        products={getProductsFromSearchResults(result?.data)}
       />
 
       <ActionDialog
@@ -364,15 +360,13 @@ export const CollectionDetails: React.FC<CollectionDetailsProps> = ({ id, params
         })}
         variant="delete"
       >
-        <DialogContentText>
-          <FormattedMessage
-            id="pVFoOk"
-            defaultMessage="Are you sure you want to delete {collectionName}?"
-            values={{
-              collectionName: <strong>{maybe(() => data.collection.name, "...")}</strong>,
-            }}
-          />
-        </DialogContentText>
+        <FormattedMessage
+          id="pVFoOk"
+          defaultMessage="Are you sure you want to delete {collectionName}?"
+          values={{
+            collectionName: <strong>{maybe(() => data.collection.name, "...")}</strong>,
+          }}
+        />
       </ActionDialog>
       <ActionDialog
         confirmButtonState={unassignProductOpts.status}
@@ -393,16 +387,14 @@ export const CollectionDetails: React.FC<CollectionDetailsProps> = ({ id, params
           description: "dialog title",
         })}
       >
-        <DialogContentText>
-          <FormattedMessage
-            id="AulH/n"
-            defaultMessage="{counter,plural,one{Are you sure you want to unassign this product?} other{Are you sure you want to unassign {displayQuantity} products?}}"
-            values={{
-              counter: maybe(() => params.ids.length),
-              displayQuantity: <strong>{maybe(() => params.ids.length)}</strong>,
-            }}
-          />
-        </DialogContentText>
+        <FormattedMessage
+          id="AulH/n"
+          defaultMessage="{counter,plural,one{Are you sure you want to unassign this product?} other{Are you sure you want to unassign {displayQuantity} products?}}"
+          values={{
+            counter: maybe(() => params.ids.length),
+            displayQuantity: <strong>{maybe(() => params.ids.length)}</strong>,
+          }}
+        />
       </ActionDialog>
       <ActionDialog
         confirmButtonState={updateCollectionOpts.status}
@@ -425,12 +417,10 @@ export const CollectionDetails: React.FC<CollectionDetailsProps> = ({ id, params
         })}
         variant="delete"
       >
-        <DialogContentText>
-          <FormattedMessage
-            id="MxhVZv"
-            defaultMessage="Are you sure you want to delete collection's image?"
-          />
-        </DialogContentText>
+        <FormattedMessage
+          id="MxhVZv"
+          defaultMessage="Are you sure you want to delete collection's image?"
+        />
       </ActionDialog>
     </PaginatorContext.Provider>
   );

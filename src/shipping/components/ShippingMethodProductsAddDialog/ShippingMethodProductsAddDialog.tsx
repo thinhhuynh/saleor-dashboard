@@ -1,54 +1,34 @@
-// @ts-strict-ignore
 import { FetchResult } from "@apollo/client";
 import { Channel, isAvailableInChannel } from "@dashboard/channels/utils";
 import BackButton from "@dashboard/components/BackButton";
 import Checkbox from "@dashboard/components/Checkbox";
 import { ConfirmButton, ConfirmButtonTransitionState } from "@dashboard/components/ConfirmButton";
+import { DashboardModal } from "@dashboard/components/Modal";
 import ResponsiveTable from "@dashboard/components/ResponsiveTable";
-import Skeleton from "@dashboard/components/Skeleton";
 import TableCellAvatar from "@dashboard/components/TableCellAvatar";
 import TableRowLink from "@dashboard/components/TableRowLink";
-import { SearchProductsQuery, ShippingPriceExcludeProductMutation } from "@dashboard/graphql";
+import { ShippingPriceExcludeProductMutation } from "@dashboard/graphql";
 import useSearchQuery from "@dashboard/hooks/useSearchQuery";
 import { renderCollection } from "@dashboard/misc";
-import { FetchMoreProps, RelayToFlat } from "@dashboard/types";
-import {
-  CircularProgress,
-  Dialog,
-  DialogActions,
-  DialogContent,
-  DialogTitle,
-  TableBody,
-  TableCell,
-  TextField,
-} from "@material-ui/core";
+import { isProductSelected } from "@dashboard/shipping/components/ShippingMethodProductsAddDialog/utils";
+import { FetchMoreProps } from "@dashboard/types";
+import { CircularProgress, TableBody, TableCell, TextField } from "@material-ui/core";
 import { makeStyles } from "@saleor/macaw-ui";
-import { Text } from "@saleor/macaw-ui-next";
+import { Box, Skeleton, Text } from "@saleor/macaw-ui-next";
 import React from "react";
 import InfiniteScroll from "react-infinite-scroll-component";
 import { FormattedMessage, useIntl } from "react-intl";
 
+import { Product, Products } from "./types";
+
 const useStyles = makeStyles(
-  theme => ({
+  () => ({
     avatar: {
       paddingLeft: 0,
       width: 64,
     },
     colName: {
       paddingLeft: 0,
-    },
-    searchBar: {
-      marginBottom: theme.spacing(3),
-    },
-    loadMoreLoaderContainer: {
-      alignItems: "center",
-      display: "flex",
-      height: theme.spacing(3),
-      justifyContent: "center",
-      marginTop: theme.spacing(3),
-    },
-    overflow: {
-      overflowY: "visible",
     },
     productCheckboxCell: {
       "&:first-child": {
@@ -63,7 +43,7 @@ const useStyles = makeStyles(
 export interface ShippingMethodProductsAddDialogProps extends FetchMoreProps {
   confirmButtonState: ConfirmButtonTransitionState;
   open: boolean;
-  products: RelayToFlat<SearchProductsQuery["search"]>;
+  products: Products;
   onClose: () => void;
   onFetch: (query: string) => void;
   onSubmit: (ids: string[]) => Promise<FetchResult<ShippingPriceExcludeProductMutation>>;
@@ -71,10 +51,10 @@ export interface ShippingMethodProductsAddDialogProps extends FetchMoreProps {
 }
 
 const handleProductAssign = (
-  product: RelayToFlat<SearchProductsQuery["search"]>[0],
+  product: Product,
   isSelected: boolean,
-  selectedProducts: RelayToFlat<SearchProductsQuery["search"]>,
-  setSelectedProducts: (data: RelayToFlat<SearchProductsQuery["search"]>) => void,
+  selectedProducts: Products,
+  setSelectedProducts: (data: Products) => void,
 ) => {
   if (isSelected) {
     setSelectedProducts(
@@ -84,6 +64,9 @@ const handleProductAssign = (
     setSelectedProducts([...selectedProducts, product]);
   }
 };
+
+const scrollableTargetId = "shippingMethodProductsAddScrollableDialog";
+
 const ShippingMethodProductsAddDialog: React.FC<ShippingMethodProductsAddDialogProps> = ({
   confirmButtonState,
   open,
@@ -99,9 +82,7 @@ const ShippingMethodProductsAddDialog: React.FC<ShippingMethodProductsAddDialogP
   const classes = useStyles();
   const intl = useIntl();
   const [query, onQueryChange, resetQuery] = useSearchQuery(onFetch);
-  const [selectedProducts, setSelectedProducts] = React.useState<
-    RelayToFlat<SearchProductsQuery["search"]>
-  >([]);
+  const [selectedProducts, setSelectedProducts] = React.useState<Products>([]);
   const handleSubmit = () => {
     onSubmit(selectedProducts.map(product => product.id)).then(() => {
       setSelectedProducts([]);
@@ -115,16 +96,17 @@ const ShippingMethodProductsAddDialog: React.FC<ShippingMethodProductsAddDialogP
   };
 
   return (
-    <Dialog onClose={handleClose} open={open} fullWidth maxWidth="sm">
-      <DialogTitle disableTypography>
-        <FormattedMessage
-          id="xZhxBJ"
-          defaultMessage="Assign Products"
-          description="dialog header"
-        />
-      </DialogTitle>
-      <DialogContent>
-        <div data-test-id="assign-products-dialog-content" className={classes.searchBar}>
+    <DashboardModal onChange={handleClose} open={open}>
+      <DashboardModal.Content size="sm" __gridTemplateRows="auto auto 1fr">
+        <DashboardModal.Header>
+          <FormattedMessage
+            id="xZhxBJ"
+            defaultMessage="Assign Products"
+            description="dialog header"
+          />
+        </DashboardModal.Header>
+
+        <Box data-test-id="assign-products-dialog-content">
           <TextField
             data-test-id="search-bar"
             name="query"
@@ -144,28 +126,34 @@ const ShippingMethodProductsAddDialog: React.FC<ShippingMethodProductsAddDialogP
               endAdornment: loading && <CircularProgress size={16} />,
             }}
           />
-        </div>
-        <div>
+        </Box>
+
+        <Box id={scrollableTargetId} overflowY="auto">
           <InfiniteScroll
             dataLength={products?.length ?? 0}
             next={onFetchMore}
             hasMore={hasMore}
             scrollThreshold="100px"
+            scrollableTarget={scrollableTargetId}
             loader={
-              <div key="loader" className={classes.loadMoreLoaderContainer}>
+              <Box
+                alignItems="center"
+                display="flex"
+                height={5}
+                justifyContent="center"
+                marginTop={5}
+                key="loader"
+              >
                 <CircularProgress size={16} />
-              </div>
+              </Box>
             }
-            height={450}
           >
             <ResponsiveTable key="table">
               <TableBody data-test-id="assign-product-list">
                 {renderCollection(
                   products,
                   (product, productIndex) => {
-                    const isSelected = selectedProducts.some(
-                      selectedProduct => selectedProduct.id === product.id,
-                    );
+                    const isSelected = isProductSelected(selectedProducts, product?.id);
 
                     const isProductAvailable = isAvailableInChannel({
                       availableChannels,
@@ -229,25 +217,26 @@ const ShippingMethodProductsAddDialog: React.FC<ShippingMethodProductsAddDialogP
               </TableBody>
             </ResponsiveTable>
           </InfiniteScroll>
-        </div>
-      </DialogContent>
-      <DialogActions>
-        <BackButton onClick={handleClose} />
-        <ConfirmButton
-          data-test-id="assign-and-save-button"
-          transitionState={confirmButtonState}
-          type="submit"
-          disabled={loading || !selectedProducts?.length}
-          onClick={handleSubmit}
-        >
-          <FormattedMessage
-            id="FzEew9"
-            defaultMessage="Assign and save"
-            description="assign products to shipping rate and save, button"
-          />
-        </ConfirmButton>
-      </DialogActions>
-    </Dialog>
+        </Box>
+
+        <DashboardModal.Actions>
+          <BackButton onClick={handleClose} />
+          <ConfirmButton
+            data-test-id="assign-and-save-button"
+            transitionState={confirmButtonState}
+            type="submit"
+            disabled={loading || !selectedProducts?.length}
+            onClick={handleSubmit}
+          >
+            <FormattedMessage
+              id="FzEew9"
+              defaultMessage="Assign and save"
+              description="assign products to shipping rate and save, button"
+            />
+          </ConfirmButton>
+        </DashboardModal.Actions>
+      </DashboardModal.Content>
+    </DashboardModal>
   );
 };
 

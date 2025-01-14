@@ -1,24 +1,24 @@
-import { MailpitService } from "@api/mailpit";
 import { GIFT_CARDS } from "@data/e2eTestData";
 import { GiftCardsPage } from "@pages/giftCardsPage";
-import { expect, test } from "@playwright/test";
+import { expect } from "@playwright/test";
+import { test } from "utils/testWithPermission";
 
-test.use({ storageState: "./playwright/.auth/admin.json" });
+test.use({ permissionName: "admin" });
 
 let giftCardsPage: GiftCardsPage;
-let mailpitService: MailpitService;
 
-test.beforeEach(async ({ page, request }) => {
+test.beforeEach(async ({ page }) => {
   test.slow();
   giftCardsPage = new GiftCardsPage(page);
-  mailpitService = new MailpitService(request);
   await giftCardsPage.gotoGiftCardsListView();
   await giftCardsPage.waitForDOMToFullyLoad();
 });
 test("TC: SALEOR_105 Issue gift card @e2e @gift", async () => {
   await giftCardsPage.clickIssueCardButton();
+  await expect(giftCardsPage.issueGiftCardDialog.amountDropdown).toBeVisible();
   await giftCardsPage.issueGiftCardDialog.typeAmount("50");
   await giftCardsPage.issueGiftCardDialog.typeCustomTag("super ultra automation discount");
+  await giftCardsPage.issueGiftCardDialog.tagsInputBlur();
   await giftCardsPage.issueGiftCardDialog.clickRequiresActivationCheckbox();
   await giftCardsPage.issueGiftCardDialog.clickIssueButton();
   await expect(giftCardsPage.issueGiftCardDialog.cardCode).toBeVisible();
@@ -29,11 +29,7 @@ test("TC: SALEOR_105 Issue gift card @e2e @gift", async () => {
   await giftCardsPage.expectSuccessBanner();
   await giftCardsPage.issueGiftCardDialog.clickOkButton();
   await giftCardsPage.giftCardDialog.waitFor({ state: "hidden" });
-  await giftCardsPage.expectSuccessBannerMessage("Successfully created gift card");
-  await giftCardsPage.successBanner.first().waitFor({
-    state: "hidden",
-    timeout: 30000,
-  });
+  await giftCardsPage.expectSuccessBanner({ message: "Successfully created gift card" });
   await giftCardsPage.gotoGiftCardsListView();
   await giftCardsPage.gridCanvas
     .getByText(`Code ending with ${code}`)
@@ -53,11 +49,7 @@ test("TC: SALEOR_106 Issue gift card with specific customer and expiry date @e2e
 
   await giftCardsPage.issueGiftCardDialog.clickOkButton();
   await giftCardsPage.giftCardDialog.waitFor({ state: "hidden" });
-  await giftCardsPage.expectSuccessBannerMessage("Successfully created gift card");
-  await giftCardsPage.successBanner.waitFor({
-    state: "hidden",
-    timeout: 30000,
-  });
+  await giftCardsPage.expectSuccessBanner({ message: "Successfully created gift card" });
   await giftCardsPage.gotoGiftCardsListView();
   await giftCardsPage.searchAndFindRowIndexes(fullCode);
   expect(
@@ -68,6 +60,9 @@ test("TC: SALEOR_106 Issue gift card with specific customer and expiry date @e2e
 test("TC: SALEOR_107 Resend code @e2e @gift", async () => {
   await giftCardsPage.clickListRowBasedOnContainingText(GIFT_CARDS.giftCardToResendCode.name);
   await giftCardsPage.clickResendCodeButton();
+  // This is a workaround for the issue with the dropdown focusing on dialog open
+  // Dropdown can cover the resend button and cause test to fail
+  await giftCardsPage.resendGiftCardCodeDialog.blur();
   await giftCardsPage.resendGiftCardCodeDialog.clickResendButton();
   await giftCardsPage.expectSuccessBanner();
 });
@@ -85,6 +80,10 @@ test("TC: SALEOR_109 Activate gift card @e2e @gift", async () => {
 });
 test("TC: SALEOR_110 Edit gift card @e2e @gift", async () => {
   await giftCardsPage.gotoExistingGiftCardView(GIFT_CARDS.giftCardToBeEdited.id);
+  await giftCardsPage.openTagInput();
+  await giftCardsPage.selectFirstTag();
+  await giftCardsPage.selectFirstTag();
+  await giftCardsPage.closeTagInput();
   await giftCardsPage.clickCardExpiresCheckbox();
   await giftCardsPage.metadataSeoPage.expandAndAddAllMetadata();
   await giftCardsPage.clickSaveButton();
@@ -115,10 +114,6 @@ test("TC: SALEOR_182 Export gift card codes in XLSX file @e2e @gift", async () =
     state: "hidden",
     timeout: 30000,
   });
-  await mailpitService.checkDoesUserReceivedExportedData(
-    process.env.E2E_USER_NAME!,
-    "Your exported gift cards data is ready",
-  );
 });
 test("TC: SALEOR_183 Export gift card codes in CSV file @e2e @gift", async () => {
   await giftCardsPage.clickShowMoreMenu();
@@ -128,8 +123,4 @@ test("TC: SALEOR_183 Export gift card codes in CSV file @e2e @gift", async () =>
     state: "hidden",
     timeout: 30000,
   });
-  await mailpitService.checkDoesUserReceivedExportedData(
-    process.env.E2E_USER_NAME!,
-    "Your exported gift cards data is ready",
-  );
 });

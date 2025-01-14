@@ -58,7 +58,7 @@ const OrderShippingMethodEditDialog: React.FC<OrderShippingMethodEditDialogProps
               </Box>
 
               {!s.active && (
-                <Text color="defaultDisabled" size={2}>
+                <Text color="defaultDisabled" size={2} fontWeight="light">
                   {s.message}
                 </Text>
               )}
@@ -78,14 +78,14 @@ const OrderShippingMethodEditDialog: React.FC<OrderShippingMethodEditDialogProps
       <Form initial={initialForm} onSubmit={onSubmit}>
         {({ change, data, submit }) => (
           <>
-            <DashboardModal.Content __width={600}>
-              <DashboardModal.Title>
+            <DashboardModal.Content size="sm">
+              <DashboardModal.Header>
                 <FormattedMessage
                   id="V/YxJa"
                   defaultMessage="Edit Shipping Method"
                   description="dialog header"
                 />
-              </DashboardModal.Title>
+              </DashboardModal.Header>
 
               <Select
                 options={choices as unknown as Option[]}

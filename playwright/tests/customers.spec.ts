@@ -6,10 +6,11 @@ import { AddAddressDialog } from "@pages/dialogs/addAddressDialog";
 import { DeleteAddressDialog } from "@pages/dialogs/deleteAddressDialog";
 import { AddressForm } from "@pages/forms/addressForm";
 import { GiftCardsPage } from "@pages/giftCardsPage";
-import { expect, test } from "@playwright/test";
+import { expect } from "@playwright/test";
 import faker from "faker";
+import { test } from "utils/testWithPermission";
 
-test.use({ storageState: "./playwright/.auth/admin.json" });
+test.use({ permissionName: "admin" });
 
 let customersPage: CustomersPage;
 let giftCardsPage: GiftCardsPage;
@@ -215,6 +216,8 @@ test("TC: SALEOR_207 Issue a new gift card for the customer @e2e @customer", asy
 
   await customersPage.gotoCustomerDetailsPage(CUSTOMERS.editCustomer.id);
   await customersPage.clickIssueNewGiftCard();
+
+  await expect(customersPage.amountDropdown).toBeVisible();
   await customersPage.issueGiftCardDialog.typeAmount(amount);
   await customersPage.issueGiftCardDialog.typeCustomTag(faker.lorem.word());
   await customersPage.issueGiftCardDialog.typeNote(faker.lorem.sentences(3));
@@ -228,8 +231,7 @@ test("TC: SALEOR_207 Issue a new gift card for the customer @e2e @customer", asy
   await giftCardsPage.expectSuccessBanner();
   await giftCardsPage.issueGiftCardDialog.clickOkButton();
   await giftCardsPage.expectElementIsHidden(giftCardsPage.giftCardDialog);
-  await giftCardsPage.expectSuccessBannerMessage("Successfully created gift card");
-  await giftCardsPage.expectElementIsHidden(giftCardsPage.successBanner);
+  await giftCardsPage.expectSuccessBanner({ message: "Successfully created gift card" });
   await giftCardsPage.gotoGiftCardsListView();
   await giftCardsPage.waitForCanvasContainsText(`Code ending with ${code}`);
 });

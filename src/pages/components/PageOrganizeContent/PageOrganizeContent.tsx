@@ -1,14 +1,12 @@
 // @ts-strict-ignore
-import CardTitle from "@dashboard/components/CardTitle";
+import { DashboardCard } from "@dashboard/components/Card";
 import { Combobox } from "@dashboard/components/Combobox";
 import { PageDetailsFragment, PageErrorFragment } from "@dashboard/graphql";
 import { FormChange } from "@dashboard/hooks/useForm";
 import { FetchMoreProps } from "@dashboard/types";
 import { getFormErrors } from "@dashboard/utils/errors";
 import getPageErrorMessage from "@dashboard/utils/errors/page";
-import { Card, CardContent, Typography } from "@material-ui/core";
-import { makeStyles } from "@saleor/macaw-ui";
-import { Option } from "@saleor/macaw-ui-next";
+import { Option, Text } from "@saleor/macaw-ui-next";
 import React from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 
@@ -27,14 +25,6 @@ export interface PageOrganizeContentProps {
   fetchMorePageTypes?: FetchMoreProps;
 }
 
-const useStyles = makeStyles(
-  theme => ({
-    label: {
-      marginBottom: theme.spacing(0.5),
-    },
-  }),
-  { name: "PageOrganizeContent" },
-);
 const PageOrganizeContent: React.FC<PageOrganizeContentProps> = props => {
   const {
     canChangeType,
@@ -48,20 +38,21 @@ const PageOrganizeContent: React.FC<PageOrganizeContentProps> = props => {
     fetchPageTypes,
     fetchMorePageTypes,
   } = props;
-  const classes = useStyles(props);
   const intl = useIntl();
   const formErrors = getFormErrors(["pageType"], errors);
 
   return (
-    <Card>
-      <CardTitle
-        title={intl.formatMessage({
-          id: "jU9GPX",
-          defaultMessage: "Organize Content",
-          description: "section header",
-        })}
-      />
-      <CardContent>
+    <DashboardCard>
+      <DashboardCard.Header>
+        <DashboardCard.Title>
+          {intl.formatMessage({
+            id: "jU9GPX",
+            defaultMessage: "Organize Content",
+            description: "section header",
+          })}
+        </DashboardCard.Title>
+      </DashboardCard.Header>
+      <DashboardCard.Content>
         {canChangeType ? (
           <Combobox
             autoComplete="off"
@@ -85,14 +76,14 @@ const PageOrganizeContent: React.FC<PageOrganizeContentProps> = props => {
           />
         ) : (
           <>
-            <Typography className={classes.label} variant="caption">
+            <Text size={2} fontWeight="light" display="block">
               <FormattedMessage id="ufD5Jr" defaultMessage="Content type" />
-            </Typography>
-            <Typography>{pageType?.name}</Typography>
+            </Text>
+            <Text>{pageType?.name}</Text>
           </>
         )}
-      </CardContent>
-    </Card>
+      </DashboardCard.Content>
+    </DashboardCard>
   );
 };
 

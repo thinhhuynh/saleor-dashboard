@@ -1,8 +1,9 @@
 import { TRANSLATIONS } from "@data/e2eTestData";
 import { TranslationsPage } from "@pages/translationsPage";
-import { expect, test } from "@playwright/test";
+import { expect } from "@playwright/test";
+import { test } from "utils/testWithPermission";
 
-test.use({ storageState: "playwright/.auth/admin.json" });
+test.use({ permissionName: "admin" });
 
 let translationsPage: TranslationsPage;
 
@@ -23,7 +24,7 @@ test("TC: SALEOR_121 Should be able to add translation  @e2e @translations", asy
   await translationsPage.editTranslationNameButton.click();
   await translationsPage.translationInput.fill("Kategoria do Translacji");
   await translationsPage.saveButton.click();
-  await expect(translationsPage.successBanner).toBeVisible();
+  await translationsPage.expectSuccessBanner();
   await expect(translationsPage.page.getByText("Kategoria do Translacji")).toBeVisible();
 });
 test("TC: SALEOR_122 Should be able to edit translation  @e2e @translations", async () => {
@@ -47,7 +48,7 @@ test("TC: SALEOR_122 Should be able to edit translation  @e2e @translations", as
   await translationsPage.translationRichText.clear();
   await translationsPage.translationRichText.fill(newDescription);
   await translationsPage.saveButton.click();
-  await expect(translationsPage.successBanner).toBeVisible();
+  await translationsPage.expectSuccessBanner();
   await translationsPage.goToDirectTranslationPage(
     "PL_PL",
     "products",
@@ -76,6 +77,6 @@ test("TC: SALEOR_123 Should be able to clear translation  @e2e @translations", a
   await translationsPage.editTranslationDescriptionButton.click();
   await translationsPage.translationRichText.clear();
   await translationsPage.saveButton.click();
-  await expect(translationsPage.successBanner).toBeVisible();
+  await translationsPage.expectSuccessBanner();
   await expect(translationsPage.page.getByText(description)).not.toBeVisible();
 });

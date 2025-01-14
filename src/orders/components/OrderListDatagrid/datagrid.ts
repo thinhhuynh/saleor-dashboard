@@ -76,12 +76,11 @@ export const useGetCellContent = ({ columns, orders }: GetCellContentProps) => {
 
   return ([column, row]: Item, { added, removed }: GetCellContentOpts): GridCell => {
     const columnId = columns[column]?.id;
+    const rowData = added.includes(row) ? undefined : orders[getDatagridRowDataIndex(row, removed)];
 
-    if (!columnId) {
+    if (!columnId || !rowData) {
       return readonlyTextCell("");
     }
-
-    const rowData = added.includes(row) ? undefined : orders[getDatagridRowDataIndex(row, removed)];
 
     switch (columnId) {
       case "number":
@@ -117,7 +116,7 @@ export function getCustomerCellContent(
     );
   }
 
-  if (rowData.userEmail) {
+  if (rowData?.userEmail) {
     return readonlyTextCell(rowData.userEmail);
   }
 

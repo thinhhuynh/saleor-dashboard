@@ -1,6 +1,6 @@
 import "@glideapps/glide-data-grid/dist/index.css";
 
-import useNavigator from "@dashboard/hooks/useNavigator";
+import useNavigator, { NavigatorOpts } from "@dashboard/hooks/useNavigator";
 import { usePreventHistoryBack } from "@dashboard/hooks/usePreventHistoryBack";
 import { getCellAction } from "@dashboard/products/components/ProductListDatagrid/datagrid";
 import DataEditor, {
@@ -16,7 +16,7 @@ import DataEditor, {
   Theme,
 } from "@glideapps/glide-data-grid";
 import { GetRowThemeCallback } from "@glideapps/glide-data-grid/dist/ts/data-grid/data-grid-render";
-import { Card, CardContent, CircularProgress } from "@material-ui/core";
+import { CircularProgress } from "@material-ui/core";
 import { Box, Text, useTheme } from "@saleor/macaw-ui-next";
 import clsx from "clsx";
 import range from "lodash/range";
@@ -31,6 +31,7 @@ import React, {
   useState,
 } from "react";
 
+import { DashboardCard } from "../Card";
 import { CardMenuItem } from "../CardMenu";
 import { FullScreenContainer } from "./components/FullScreenContainer";
 import { RowActions } from "./components/RowActions";
@@ -97,6 +98,7 @@ export interface DatagridProps {
   recentlyAddedColumn?: string | null; // Enables scroll to recently added column
   onClearRecentlyAddedColumn?: () => void;
   renderHeader?: (props: DatagridRenderHeaderProps) => ReactNode;
+  navigatorOpts?: NavigatorOpts;
 }
 
 export const Datagrid: React.FC<DatagridProps> = ({
@@ -129,6 +131,7 @@ export const Datagrid: React.FC<DatagridProps> = ({
   onClearRecentlyAddedColumn,
   rowHeight = cellHeight,
   renderHeader,
+  navigatorOpts,
   ...datagridProps
 }): ReactElement => {
   const classes = useStyles({ actionButtonPosition });
@@ -393,7 +396,7 @@ export const Datagrid: React.FC<DatagridProps> = ({
 
   if (loading) {
     return (
-      <Box data-test-id="loader" display="flex" justifyContent="center" marginY={9}>
+      <Box data-test-id="datagrid-loader" display="flex" justifyContent="center" marginY={9}>
         <CircularProgress />
       </Box>
     );
@@ -401,14 +404,20 @@ export const Datagrid: React.FC<DatagridProps> = ({
 
   return (
     <FullScreenContainer open={isOpen} className={fullScreenClasses.fullScreenContainer}>
-      <Card className={classes.root}>
+      <DashboardCard position="relative" __height={isOpen ? "100%" : "auto"} gap={0}>
         {renderHeader?.({
           toggleFullscreen: toggle,
           addRowOnDatagrid: onRowAdded,
           isFullscreenOpen: isOpen,
           isAnimationOpenFinished,
         })}
-        <CardContent classes={{ root: classes.cardContentRoot }} data-test-id="list">
+        <DashboardCard.Content
+          height="100%"
+          display="flex"
+          flexDirection="column"
+          paddingX={0}
+          data-test-id="list"
+        >
           {rowsTotal > 0 || showEmptyDatagrid ? (
             <>
               {selection?.rows && selection?.rows.length > 0 && selectionActionsComponent && (
@@ -506,8 +515,8 @@ export const Datagrid: React.FC<DatagridProps> = ({
               </Text>
             </Box>
           )}
-        </CardContent>
-      </Card>
+        </DashboardCard.Content>
+      </DashboardCard>
       <TooltipContainer
         clearTooltip={clearTooltip}
         bounds={tooltip?.bounds}
@@ -524,7 +533,7 @@ export const Datagrid: React.FC<DatagridProps> = ({
             e.preventDefault();
 
             if (e.currentTarget.dataset.reactRouterPath) {
-              navigate(e.currentTarget.dataset.reactRouterPath);
+              navigate(e.currentTarget.dataset.reactRouterPath, navigatorOpts);
             }
           }}
         />

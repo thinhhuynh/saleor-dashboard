@@ -17,7 +17,7 @@ import {
 } from "@dashboard/discounts/handlers";
 import { itemsQuantityMessages } from "@dashboard/discounts/translations";
 import { DiscountTypeEnum, RequirementsPicker } from "@dashboard/discounts/types";
-import { voucherListUrl } from "@dashboard/discounts/urls";
+import { voucherListPath } from "@dashboard/discounts/urls";
 import {
   DiscountErrorFragment,
   DiscountValueTypeEnum,
@@ -25,12 +25,13 @@ import {
   VoucherDetailsFragment,
   VoucherTypeEnum,
 } from "@dashboard/graphql";
+import { useBackLinkWithState } from "@dashboard/hooks/useBackLinkWithState";
 import { UseListSettings } from "@dashboard/hooks/useListSettings";
 import { LocalPagination } from "@dashboard/hooks/useLocalPaginator";
 import useNavigator from "@dashboard/hooks/useNavigator";
-import { mapEdgesToItems, mapMetadataItemToInput } from "@dashboard/utils/maps";
+import { mapMetadataItemToInput } from "@dashboard/utils/maps";
 import useMetadataChangeTrigger from "@dashboard/utils/metadata/useMetadataChangeTrigger";
-import { Typography } from "@material-ui/core";
+import { Text } from "@saleor/macaw-ui-next";
 import React from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 
@@ -209,6 +210,10 @@ const VoucherDetailsPage: React.FC<VoucherDetailsPageProps> = ({
     privateMetadata: voucher?.privateMetadata.map(mapMetadataItemToInput),
   };
 
+  const voucherListBackLink = useBackLinkWithState({
+    path: voucherListPath,
+  });
+
   return (
     <Form confirmLeave initial={initialForm} onSubmit={onSubmit}>
       {({ change, data, submit, triggerChange, set }) => {
@@ -224,7 +229,7 @@ const VoucherDetailsPage: React.FC<VoucherDetailsPageProps> = ({
 
         return (
           <DetailPageLayout>
-            <TopNav href={voucherListUrl()} title={voucher?.name} />
+            <TopNav href={voucherListBackLink} title={voucher?.name} />
             <DetailPageLayout.Content>
               <VoucherInfo data={data} disabled={disabled} errors={errors} onChange={change} />
               <VoucherCodes
@@ -324,7 +329,7 @@ const VoucherDetailsPage: React.FC<VoucherDetailsPageProps> = ({
                       disabled={disabled}
                       onProductAssign={onProductAssign}
                       onProductUnassign={onProductUnassign}
-                      products={mapEdgesToItems(voucher?.products)}
+                      discount={voucher}
                       isChecked={isChecked}
                       selected={selected}
                       toggle={toggle}
@@ -349,12 +354,12 @@ const VoucherDetailsPage: React.FC<VoucherDetailsPageProps> = ({
                         defaultMessage: "Countries",
                         description: "voucher country range",
                       })}
-                      <Typography variant="caption">
+                      <Text size={2} fontWeight="light" display="block">
                         <FormattedMessage
                           id="glT6fm"
                           defaultMessage="Voucher is limited to these countries"
                         />
-                      </Typography>
+                      </Text>
                     </>
                   }
                   onCountryAssign={onCountryAssign}
@@ -396,7 +401,7 @@ const VoucherDetailsPage: React.FC<VoucherDetailsPageProps> = ({
             <Savebar>
               <Savebar.DeleteButton onClick={onRemove} />
               <Savebar.Spacer />
-              <Savebar.CancelButton onClick={() => navigate(voucherListUrl())} />
+              <Savebar.CancelButton onClick={() => navigate(voucherListBackLink)} />
               <Savebar.ConfirmButton
                 transitionState={saveButtonBarState}
                 onClick={() => handleSubmit(data)}

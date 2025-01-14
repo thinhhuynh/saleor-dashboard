@@ -1,8 +1,10 @@
 import { ListFilters } from "@dashboard/components/AppLayout/ListFilters";
 import { TopNav } from "@dashboard/components/AppLayout/TopNav";
 import { BulkDeleteButton } from "@dashboard/components/BulkDeleteButton";
+import { DashboardCard } from "@dashboard/components/Card";
 import { FilterPresetsSelect } from "@dashboard/components/FilterPresetsSelect";
 import { ListPageLayout } from "@dashboard/components/Layouts";
+import { getPrevLocationState } from "@dashboard/hooks/useBackLinkWithState";
 import useNavigator from "@dashboard/hooks/useNavigator";
 import { sectionNames } from "@dashboard/intl";
 import { Pages } from "@dashboard/pages/types";
@@ -13,10 +15,10 @@ import {
   pageUrl,
 } from "@dashboard/pages/urls";
 import { FilterPagePropsWithPresets, PageListProps, SortPage } from "@dashboard/types";
-import { Card } from "@material-ui/core";
 import { Box, Button, ChevronRightIcon } from "@saleor/macaw-ui-next";
 import React from "react";
 import { FormattedMessage, useIntl } from "react-intl";
+import { useLocation } from "react-router";
 
 import {
   createFilterStructure,
@@ -65,6 +67,7 @@ const PageListPage: React.FC<PageListPageProps> = ({
   ...listProps
 }) => {
   const intl = useIntl();
+  const location = useLocation();
   const navigate = useNavigator();
   const structure = createFilterStructure(intl, filterOpts);
   const [isFilterPresetOpen, setFilterPresetOpen] = React.useState(false);
@@ -102,7 +105,7 @@ const PageListPage: React.FC<PageListPageProps> = ({
           </Box>
         </Box>
       </TopNav>
-      <Card>
+      <DashboardCard>
         <ListFilters
           filterStructure={structure}
           initialSearch={initialSearch}
@@ -129,9 +132,13 @@ const PageListPage: React.FC<PageListPageProps> = ({
           {...listProps}
           hasRowHover={!isFilterPresetOpen}
           rowAnchor={pageUrl}
-          onRowClick={id => navigate(pageUrl(id))}
+          onRowClick={id =>
+            navigate(pageUrl(id), {
+              state: getPrevLocationState(location),
+            })
+          }
         />
-      </Card>
+      </DashboardCard>
     </ListPageLayout>
   );
 };

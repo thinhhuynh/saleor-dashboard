@@ -1,8 +1,7 @@
 import { AppInstallation, InstalledApp } from "@dashboard/apps/types";
 import { useHasManagedAppsPermission } from "@dashboard/hooks/useHasManagedAppsPermission";
 import { ListProps } from "@dashboard/types";
-import { Skeleton } from "@material-ui/lab";
-import { Box, List, Text } from "@saleor/macaw-ui-next";
+import { Box, List, Skeleton, Text } from "@saleor/macaw-ui-next";
 import React from "react";
 import { useIntl } from "react-intl";
 
@@ -21,7 +20,7 @@ const InstalledAppList: React.FC<InstalledAppListProps> = ({ appList, appInstall
   const { hasManagedAppsPermission } = useHasManagedAppsPermission();
 
   if (appsAreLoading({ appList, appInstallationList, hasManagedAppsPermission })) {
-    return <Skeleton />;
+    return <Skeleton data-test-id="installed-apps-loader" />;
   }
 
   if (hasEmptyAppList({ appList, appInstallationList, hasManagedAppsPermission })) {

@@ -1,5 +1,5 @@
 // @ts-strict-ignore
-import NewActionDialog from "@dashboard/components/ActionDialog/NewActionDialog";
+import ActionDialog from "@dashboard/components/ActionDialog";
 import { Combobox } from "@dashboard/components/Combobox";
 import { ConfirmButtonTransitionState } from "@dashboard/components/ConfirmButton";
 import useModalDialogOpen from "@dashboard/hooks/useModalDialogOpen";
@@ -44,13 +44,14 @@ const ProductTypePickerDialog: React.FC<ProductTypePickerDialogProps> = ({
   });
 
   return (
-    <NewActionDialog
+    <ActionDialog
       confirmButtonState={confirmButtonState}
       open={open}
       onClose={onClose}
       onConfirm={() => onConfirm(choice)}
       title={intl.formatMessage(messages.selectProductType)}
       disabled={!choice}
+      size="xs"
     >
       <Combobox
         data-test-id="dialog-product-type"
@@ -65,7 +66,7 @@ const ProductTypePickerDialog: React.FC<ProductTypePickerDialogProps> = ({
         }}
         onChange={e => setChoice(e.target.value)}
       />
-    </NewActionDialog>
+    </ActionDialog>
   );
 };
 

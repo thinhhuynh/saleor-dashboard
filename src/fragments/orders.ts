@@ -155,7 +155,7 @@ export const fragmentOrderLineWithMetadata = gql`
       metadata {
         ...MetadataItem
       }
-      privateMetadata @include(if: $isStaffUser) {
+      privateMetadata @include(if: $hasManageProducts) {
         ...MetadataItem
       }
     }
@@ -730,6 +730,19 @@ export const fragmentOrderDetailsGrantRefund = gql`
     }
     transactions {
       ...TransactionItem
+    }
+  }
+`;
+
+export const fragmentActivities = gql`
+  fragment Activities on OrderEvent {
+    date
+    email
+    message
+    orderNumber
+    type
+    user {
+      email
     }
   }
 `;

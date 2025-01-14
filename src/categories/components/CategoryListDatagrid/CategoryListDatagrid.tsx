@@ -8,11 +8,13 @@ import {
 } from "@dashboard/components/Datagrid/hooks/useDatagridChange";
 import { TablePaginationWithContext } from "@dashboard/components/TablePagination";
 import { CategoryFragment } from "@dashboard/graphql";
+import { getPrevLocationState } from "@dashboard/hooks/useBackLinkWithState";
 import { PageListProps, SortPage } from "@dashboard/types";
 import { Item } from "@glideapps/glide-data-grid";
 import { Box } from "@saleor/macaw-ui-next";
 import React, { ReactNode, useCallback, useMemo } from "react";
 import { useIntl } from "react-intl";
+import { useLocation } from "react-router";
 
 import { categoryListStaticColumnsAdapter, createGetCellContent } from "./datagrid";
 import { messages } from "./messages";
@@ -37,6 +39,7 @@ export const CategoryListDatagrid = ({
   selectionActionButton = null,
   hasRowHover = true,
 }: CategoryListDatagridProps) => {
+  const location = useLocation();
   const datagridState = useDatagridChangeState();
   const intl = useIntl();
   const memoizedStaticColumns = useMemo(
@@ -103,6 +106,7 @@ export const CategoryListDatagrid = ({
             staticColumns={staticColumns}
           />
         )}
+        navigatorOpts={{ state: getPrevLocationState(location) }}
       />
 
       <Box paddingX={6}>

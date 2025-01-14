@@ -6,7 +6,6 @@ import { ConfirmButtonTransitionState } from "@dashboard/components/ConfirmButto
 import { DateTime } from "@dashboard/components/Date";
 import { DetailPageLayout } from "@dashboard/components/Layouts";
 import { Savebar } from "@dashboard/components/Savebar";
-import Skeleton from "@dashboard/components/Skeleton";
 import {
   ChannelUsabilityDataQuery,
   OrderDetailsFragment,
@@ -14,13 +13,13 @@ import {
   OrderLineInput,
   SearchCustomersQuery,
 } from "@dashboard/graphql";
+import { useBackLinkWithState } from "@dashboard/hooks/useBackLinkWithState";
 import { SubmitPromise } from "@dashboard/hooks/useForm";
 import useNavigator from "@dashboard/hooks/useNavigator";
 import OrderChannelSectionCard from "@dashboard/orders/components/OrderChannelSectionCard";
 import { orderDraftListUrl } from "@dashboard/orders/urls";
 import { FetchMoreProps, RelayToFlat } from "@dashboard/types";
-import { Typography } from "@material-ui/core";
-import { Box } from "@saleor/macaw-ui-next";
+import { Box, Skeleton, Text } from "@saleor/macaw-ui-next";
 import React from "react";
 import { useIntl } from "react-intl";
 
@@ -53,6 +52,8 @@ export interface OrderDraftPageProps extends FetchMoreProps {
   onShowMetadata: (id: string) => void;
 }
 
+const draftOrderListUrl = orderDraftListUrl();
+
 const OrderDraftPage: React.FC<OrderDraftPageProps> = props => {
   const {
     loading,
@@ -80,19 +81,22 @@ const OrderDraftPage: React.FC<OrderDraftPageProps> = props => {
   } = props;
   const navigate = useNavigator();
   const intl = useIntl();
+  const backLinkUrl = useBackLinkWithState({
+    path: draftOrderListUrl,
+  });
 
   return (
     <DetailPageLayout>
       <TopNav
-        href={orderDraftListUrl()}
+        href={backLinkUrl}
         title={
           <Box display="flex" alignItems="center" gap={3}>
             <span>{order?.number ? "#" + order?.number : undefined}</span>
             <div>
               {order && order.created ? (
-                <Typography variant="body2">
+                <Text size={3} fontWeight="regular">
                   <DateTime date={order.created} plain />
-                </Typography>
+                </Text>
               ) : (
                 <Skeleton style={{ width: "10em" }} />
               )}
@@ -114,10 +118,7 @@ const OrderDraftPage: React.FC<OrderDraftPageProps> = props => {
         />
       </TopNav>
       <DetailPageLayout.Content>
-        <OrderDraftAlert
-          order={order as OrderDetailsFragment}
-          channelUsabilityData={channelUsabilityData}
-        />
+        <OrderDraftAlert order={order} channelUsabilityData={channelUsabilityData} />
         <OrderDraftDetails
           order={order as OrderDetailsFragment}
           channelUsabilityData={channelUsabilityData}

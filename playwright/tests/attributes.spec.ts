@@ -1,10 +1,11 @@
 import { ATTRIBUTES } from "@data/e2eTestData";
 import { AttributesPage } from "@pages/attributesPage";
 import { ConfigurationPage } from "@pages/configurationPage";
-import { expect, test } from "@playwright/test";
+import { expect } from "@playwright/test";
 import faker from "faker";
+import { test } from "utils/testWithPermission";
 
-test.use({ storageState: "./playwright/.auth/admin.json" });
+test.use({ permissionName: "admin" });
 
 let attributesPage: AttributesPage;
 let configurationPage: ConfigurationPage;
@@ -19,7 +20,7 @@ const attributeClasses = ["PRODUCT_TYPE", "PAGE_TYPE"];
 
 for (const attr of attributeClasses) {
   for (const type of ATTRIBUTES.attributeTypesWithAbilityToAddValues.names) {
-    const uniqueSlug = `${attr}-${type.replace(" ", "-")}-${SALEOR_124_uuid}`;
+    const uniqueSlug = `${attr}-${type}-${SALEOR_124_uuid}`.replace(/\s+/g, "-");
 
     test(`TC: SALEOR_124 User should be able to create ${attr} ${type} attribute with ability to add values, required, public @e2e @attributes`, async ({
       page,
@@ -35,7 +36,7 @@ for (const attr of attributeClasses) {
       await expect(attributesPage.attrValuesSection).toBeVisible();
       await attributesPage.clickAssignAttributeValueButton();
       await attributesPage.addValueDialog.typeAndSaveAttributeValue();
-      await attributesPage.waitForNetworkIdleAfterAction(() => attributesPage.clickSaveButton());
+      await attributesPage.clickSaveButton();
       await attributesPage.expectSuccessBanner();
       await expect(await attributesPage.attributesRows.count()).toEqual(1);
       await attributesPage.valueRequiredCheckbox.waitFor({
@@ -53,7 +54,7 @@ const SALEOR_125_uuid = faker.datatype.uuid();
 
 for (const attr of attributeClasses) {
   for (const type of ATTRIBUTES.attributeTypesWithoutAbilityToAddValues.names) {
-    const uniqueSlug = `${attr}-${type.replace(" ", "-")}-${SALEOR_125_uuid}`;
+    const uniqueSlug = `${attr}-${type}-${SALEOR_125_uuid}`.replace(/\s+/g, "-");
 
     test(`TC: SALEOR_125 User should be able to create ${attr} ${type} attribute without ability to add values, NOT required, private @e2e @attributes`, async ({
       page,
@@ -71,7 +72,7 @@ for (const attr of attributeClasses) {
       await expect(attributesPage.assignAttributeValueButton).not.toBeVisible();
       await attributesPage.clickValueRequiredCheckbox();
       await attributesPage.changeAttributeVisibility();
-      await attributesPage.waitForNetworkIdleAfterAction(() => attributesPage.clickSaveButton());
+      await attributesPage.clickSaveButton();
       await attributesPage.expectSuccessBanner();
       await attributesPage.valueRequiredCheckbox.waitFor({
         state: "visible",
@@ -88,7 +89,7 @@ const SALEOR_126_uuid = faker.datatype.uuid();
 
 for (const attr of attributeClasses) {
   for (const entity of ATTRIBUTES.attributeReferencesEntities.names) {
-    const uniqueSlug = `${attr}-${entity.replaceAll(" ", "-")}-${SALEOR_126_uuid}`;
+    const uniqueSlug = `${attr}-${entity}-${SALEOR_126_uuid}`.replace(/\s+/g, "-");
 
     test(`TC: SALEOR_126 User should be able to create ${attr} References attribute for ${entity}, NOT required, public @e2e @attributes`, async ({
       page,
@@ -101,10 +102,10 @@ for (const attr of attributeClasses) {
       await attributesPage.selectAttributeType(attr);
       await attributesPage.typeAttributeDefaultLabel(`${attr} - REFERENCES for ${entity}`);
       await attributesPage.fillAttributeSlug(uniqueSlug);
-      await attributesPage.selectAttributeInputType("Reference");
+      await attributesPage.selectAttributeInputType("REFERENCE");
       await attributesPage.selectAttributeEntityType(entity);
       await attributesPage.clickValueRequiredCheckbox();
-      await attributesPage.waitForNetworkIdleAfterAction(() => attributesPage.clickSaveButton());
+      await attributesPage.clickSaveButton();
       await attributesPage.expectSuccessBanner();
       await attributesPage.valueRequiredCheckbox.waitFor({
         state: "visible",
@@ -133,9 +134,7 @@ const attributesWithValuesToBeUpdated = [productAttrWithValues, contentAttrWithV
 
 for (const attribute of attributesWithValuesToBeUpdated) {
   test(`TC: SALEOR_127 User should be able to update attribute values in existing ${attribute.name} attribute @e2e @attributes`, async () => {
-    await attributesPage.waitForNetworkIdleAfterAction(() =>
-      attributesPage.gotoExistingAttributePage(attribute.id, attribute.name),
-    );
+    await attributesPage.gotoExistingAttributePage(attribute.id, attribute.name);
     await attributesPage.clickDeleteAttrValueButton(attribute.valueToBeDeleted);
     await expect(attributesPage.dialog).toBeVisible();
     await attributesPage.deleteAttributeValueDialog.deleteAttributeValue();
@@ -150,7 +149,7 @@ for (const attribute of attributesWithValuesToBeUpdated) {
       `new value for ${attribute.name}`,
     );
     await attributesPage.expectSuccessBanner();
-    await attributesPage.waitForNetworkIdleAfterAction(() => attributesPage.clickSaveButton());
+    await attributesPage.clickSaveButton();
     await attributesPage.expectSuccessBanner();
     await expect(attributesPage.attrValuesSection).not.toContainText(attribute.valueToBeDeleted);
     await expect(attributesPage.attrValuesSection).toContainText(
@@ -162,17 +161,26 @@ for (const attribute of attributesWithValuesToBeUpdated) {
 
 for (const attr of ATTRIBUTES.attributesToBeUpdated) {
   test(`TC: SALEOR_128 User should be able to edit existing ${attr.name} attribute @e2e @attributes`, async () => {
-    await attributesPage.waitForNetworkIdleAfterAction(() =>
-      attributesPage.gotoExistingAttributePage(attr.id, attr.name),
-    );
-    await attributesPage.attributeDefaultLabelInput.clear();
-    await attributesPage.typeAttributeDefaultLabel(`updated ${attr.name}`);
+    await attributesPage.gotoExistingAttributePage(attr.id, attr.name);
+
+    await attributesPage.attributeDefaultLabelInput.fill(`updated ${attr.name}`);
+
     await attributesPage.expandMetadataSection();
     await attributesPage.metadataAddFieldButton.click();
+
     await attributesPage.fillMetadataFields("new key", "new value");
-    await attributesPage.waitForNetworkIdleAfterAction(() => attributesPage.clickSaveButton());
+    //Clicking tab only to change focus from the input, allowing to save metadata
+    await attributesPage.page.keyboard.press("Tab");
+
+    await attributesPage.clickSaveButton();
     await attributesPage.expectSuccessBanner();
+    await attributesPage.expectElementIsHidden(attributesPage.successBanner);
+
+    await attributesPage.expandMetadataSection();
+
+    await expect(attributesPage.attributeSelect).toBeVisible();
     await expect(attributesPage.attributeSelect).toHaveAttribute("aria-disabled", "true");
+    await expect(attributesPage.metadataKeyInput).toBeVisible();
     await expect(attributesPage.metadataKeyInput).toHaveValue("new key");
     await expect(attributesPage.metadataValueInput).toHaveValue("new value");
     await expect(attributesPage.attributeDefaultLabelInput).toHaveValue(`updated ${attr.name}`);
@@ -197,9 +205,8 @@ for (const attribute of attributesToBeDeleted) {
       state: "visible",
       timeout: 10000,
     });
-    await attributesPage.waitForNetworkIdleAfterAction(() =>
-      attributesPage.deleteAttributeDialog.deleteAttribute(),
-    );
+    await attributesPage.deleteAttributeDialog.deleteAttribute();
+    await attributesPage.page.getByText("Attribute deleted").waitFor({ state: "visible" });
     await attributesPage.waitForGrid();
     await expect(attributesPage.gridCanvas).not.toContainText(attribute.name);
   });
@@ -212,9 +219,7 @@ test("TC: SALEOR_130 Bulk delete attributes @e2e @attributes", async () => {
   await attributesPage.clickGridCell(0, 1);
   await attributesPage.clickGridCell(0, 2);
   await attributesPage.clickBulkDeleteGridRowsButton();
-  await attributesPage.waitForNetworkIdleAfterAction(() =>
-    attributesPage.deleteAttributesInBulkDialog.deleteSelectedAttributes(),
-  );
+  await attributesPage.deleteAttributesInBulkDialog.deleteSelectedAttributes();
   await attributesPage.expectSuccessBanner();
   await expect(attributesPage.emptyDataGridListView).toBeVisible();
 });

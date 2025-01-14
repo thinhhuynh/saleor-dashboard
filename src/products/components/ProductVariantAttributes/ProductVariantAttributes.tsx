@@ -1,15 +1,13 @@
 // @ts-strict-ignore
-import CardTitle from "@dashboard/components/CardTitle";
+import { DashboardCard } from "@dashboard/components/Card";
 import { Combobox } from "@dashboard/components/Combobox";
 import FormSpacer from "@dashboard/components/FormSpacer";
 import Grid from "@dashboard/components/Grid";
-import Skeleton from "@dashboard/components/Skeleton";
 import { ProductErrorWithAttributesFragment, ProductVariantFragment } from "@dashboard/graphql";
 import { FormsetAtomicData, FormsetChange } from "@dashboard/hooks/useFormset";
 import { commonMessages } from "@dashboard/intl";
 import { getProductVariantAttributeErrorMessage } from "@dashboard/utils/errors/product";
-import { Card, CardContent, Typography } from "@material-ui/core";
-import { Option } from "@saleor/macaw-ui-next";
+import { Option, Skeleton, Text } from "@saleor/macaw-ui-next";
 import React from "react";
 import { useIntl } from "react-intl";
 
@@ -67,9 +65,13 @@ const ProductVariantAttributes: React.FC<ProductVariantAttributesProps> = ({
   const intl = useIntl();
 
   return (
-    <Card>
-      <CardTitle title={intl.formatMessage(commonMessages.generalInformations)} />
-      <CardContent>
+    <DashboardCard>
+      <DashboardCard.Header>
+        <DashboardCard.Title>
+          {intl.formatMessage(commonMessages.generalInformations)}
+        </DashboardCard.Title>
+      </DashboardCard.Header>
+      <DashboardCard.Content>
         <Grid variant="uniform">
           {attributes === undefined ? (
             <Skeleton />
@@ -105,14 +107,14 @@ const ProductVariantAttributes: React.FC<ProductVariantAttributesProps> = ({
             {errors
               .filter(error => error.field === "attributes" && error.attributes === null)
               .map(error => (
-                <Typography color="error" key={error.code}>
+                <Text color="critical1" key={error.code}>
                   {getProductVariantAttributeErrorMessage(error, intl)}
-                </Typography>
+                </Text>
               ))}
           </>
         )}
-      </CardContent>
-    </Card>
+      </DashboardCard.Content>
+    </DashboardCard>
   );
 };
 

@@ -9,7 +9,8 @@ import {
   useGiftCardSettingsQuery,
 } from "@dashboard/graphql";
 import useForm from "@dashboard/hooks/useForm";
-import { Divider, TextField, Typography } from "@material-ui/core";
+import { Divider, TextField } from "@material-ui/core";
+import { Text } from "@saleor/macaw-ui-next";
 import React from "react";
 import { useIntl } from "react-intl";
 
@@ -17,7 +18,6 @@ import GiftCardCreateExpirySelect from "../GiftCardCreateDialog/GiftCardCreateEx
 import GiftCardCreateMoneyInput from "../GiftCardCreateDialog/GiftCardCreateMoneyInput";
 import GiftCardCreateRequiresActivationSection from "../GiftCardCreateDialog/GiftCardCreateRequiresActivationSection";
 import { giftCardCreateMessages as messages } from "../GiftCardCreateDialog/messages";
-import { useGiftCardCreateFormStyles as useStyles } from "../GiftCardCreateDialog/styles";
 import { getGiftCardErrorMessage } from "../GiftCardUpdate/messages";
 import {
   GiftCardBulkCreateFormCommonProps,
@@ -52,7 +52,6 @@ const GiftCardBulkCreateDialogForm: React.FC<GiftCardBulkCreateDialogFormProps> 
   formErrors = {},
 }) => {
   const intl = useIntl();
-  const classes = useStyles({});
   const { data: settingsData, loading: loadingSettings } = useGiftCardSettingsQuery();
   const getInitialExpirySettingsData = (): Partial<GiftCardBulkCreateFormData> => {
     if (loadingSettings) {
@@ -93,7 +92,7 @@ const GiftCardBulkCreateDialogForm: React.FC<GiftCardBulkCreateDialogFormProps> 
         error={!!formErrors?.count}
         name="cardsAmount"
         onChange={change}
-        className={classes.fullWidthContainer}
+        fullWidth
         label={intl.formatMessage(messages.giftCardsAmountLabel)}
         value={cardsAmount}
         helperText={getGiftCardErrorMessage(formErrors?.count, intl)}
@@ -106,7 +105,7 @@ const GiftCardBulkCreateDialogForm: React.FC<GiftCardBulkCreateDialogFormProps> 
         error={formErrors?.tags}
         name="tags"
         values={tags}
-        toggleChange={change}
+        onChange={change}
       />
 
       <Divider />
@@ -117,7 +116,7 @@ const GiftCardBulkCreateDialogForm: React.FC<GiftCardBulkCreateDialogFormProps> 
 
       <GiftCardCreateRequiresActivationSection onChange={change} checked={requiresActivation} />
 
-      <Typography>{intl.formatMessage(messages.bulkCreateExplanation)}</Typography>
+      <Text>{intl.formatMessage(messages.bulkCreateExplanation)}</Text>
 
       <DashboardModal.Actions>
         <BackButton onClick={onClose} />

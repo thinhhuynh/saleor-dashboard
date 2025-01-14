@@ -14,7 +14,6 @@ import useCategorySearch from "@dashboard/searches/useCategorySearch";
 import useCollectionSearch from "@dashboard/searches/useCollectionSearch";
 import usePageSearch from "@dashboard/searches/usePageSearch";
 import { mapEdgesToItems } from "@dashboard/utils/maps";
-import { DialogContentText } from "@material-ui/core";
 import React from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 
@@ -36,7 +35,8 @@ import {
 import { menuUrl, MenuUrlQueryParams } from "../../urls";
 import { handleDelete, handleItemCreate, handleItemUpdate, handleUpdate } from "./successHandlers";
 import {
-  getInitialDisplayValue,
+  getInitialMenuItemLabel,
+  getInitialMenuItemValue,
   getMenuItemCreateInputData,
   getMenuItemInputData,
   getMoves,
@@ -136,7 +136,8 @@ const MenuDetails: React.FC<MenuDetailsProps> = ({ id, params }) => {
   const initialMenuItemUpdateFormData: MenuItemDialogFormData = {
     id: maybe(() => getItemId(menuItem)),
     name: maybe(() => menuItem.name, "..."),
-    type: maybe<MenuItemType>(() => getItemType(menuItem), "category"),
+    linkType: maybe<MenuItemType>(() => getItemType(menuItem), "category"),
+    linkValue: getInitialMenuItemValue(menuItem),
   };
   // This is a workaround to let know <MenuDetailsPage />
   // that it should clean operation stack if mutations
@@ -206,15 +207,13 @@ const MenuDetails: React.FC<MenuDetailsProps> = ({ id, params }) => {
           description: "dialog header",
         })}
       >
-        <DialogContentText>
-          <FormattedMessage
-            id="G/SYtU"
-            defaultMessage="Are you sure you want to delete menu {menuName}?"
-            values={{
-              menuName: <strong>{maybe(() => data.menu.name, "...")}</strong>,
-            }}
-          />
-        </DialogContentText>
+        <FormattedMessage
+          id="G/SYtU"
+          defaultMessage="Are you sure you want to delete menu {menuName}?"
+          values={{
+            menuName: <strong>{maybe(() => data.menu.name, "...")}</strong>,
+          }}
+        />
       </ActionDialog>
 
       <MenuItemDialog
@@ -237,7 +236,7 @@ const MenuDetails: React.FC<MenuDetailsProps> = ({ id, params }) => {
         errors={maybe(() => menuItemUpdateOpts.data.menuItemUpdate.errors, [])}
         pages={pages}
         initial={initialMenuItemUpdateFormData}
-        initialDisplayValue={getInitialDisplayValue(menuItem)}
+        initialDisplayValue={getInitialMenuItemLabel(menuItem)}
         loading={categorySearch.result.loading || collectionSearch.result.loading}
         confirmButtonState={menuItemUpdateOpts.status}
         disabled={menuItemUpdateOpts.loading}

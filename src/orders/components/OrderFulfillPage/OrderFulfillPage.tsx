@@ -1,14 +1,13 @@
 // @ts-strict-ignore
 import { TopNav } from "@dashboard/components/AppLayout/TopNav";
+import { DashboardCard } from "@dashboard/components/Card";
 import CardSpacer from "@dashboard/components/CardSpacer";
-import CardTitle from "@dashboard/components/CardTitle";
 import { ConfirmButtonTransitionState } from "@dashboard/components/ConfirmButton";
 import ControlledCheckbox from "@dashboard/components/ControlledCheckbox";
 import Form from "@dashboard/components/Form";
 import { DetailPageLayout } from "@dashboard/components/Layouts";
 import ResponsiveTable from "@dashboard/components/ResponsiveTable";
 import { Savebar } from "@dashboard/components/Savebar";
-import Skeleton from "@dashboard/components/Skeleton";
 import TableRowLink from "@dashboard/components/TableRowLink";
 import {
   FulfillOrderMutation,
@@ -35,8 +34,8 @@ import {
   getToFulfillOrderLines,
   OrderFulfillLineFormData,
 } from "@dashboard/orders/utils/data";
-import { Card, CardContent, TableBody, TableCell, TableHead } from "@material-ui/core";
-import { Box, Tooltip } from "@saleor/macaw-ui-next";
+import { TableBody, TableCell, TableHead } from "@material-ui/core";
+import { Box, Skeleton, Tooltip } from "@saleor/macaw-ui-next";
 import clsx from "clsx";
 import React from "react";
 import { FormattedMessage, useIntl } from "react-intl";
@@ -182,8 +181,12 @@ const OrderFulfillPage: React.FC<OrderFulfillPageProps> = props => {
         >
           {({ change, data, submit }) => (
             <>
-              <Card>
-                <CardTitle title={intl.formatMessage(messages.itemsReadyToShip)} />
+              <DashboardCard>
+                <DashboardCard.Header>
+                  <DashboardCard.Title>
+                    {intl.formatMessage(messages.itemsReadyToShip)}
+                  </DashboardCard.Title>
+                </DashboardCard.Header>
                 {order ? (
                   <ResponsiveTable className={classes.table}>
                     <TableHead>
@@ -227,26 +230,30 @@ const OrderFulfillPage: React.FC<OrderFulfillPageProps> = props => {
                     </TableBody>
                   </ResponsiveTable>
                 ) : (
-                  <CardContent>
+                  <DashboardCard.Content>
                     <Skeleton />
-                  </CardContent>
+                  </DashboardCard.Content>
                 )}
-              </Card>
+              </DashboardCard>
 
               <CardSpacer />
 
               {shopSettings?.fulfillmentAutoApprove && (
-                <Card>
-                  <CardTitle title={intl.formatMessage(messages.shipmentInformation)} />
-                  <CardContent>
+                <DashboardCard>
+                  <DashboardCard.Header>
+                    <DashboardCard.Title>
+                      {intl.formatMessage(messages.shipmentInformation)}
+                    </DashboardCard.Title>
+                  </DashboardCard.Header>
+                  <DashboardCard.Content>
                     <ControlledCheckbox
                       checked={data.sendInfo}
                       label={intl.formatMessage(messages.sentShipmentDetails)}
                       name="sendInfo"
                       onChange={change}
                     />
-                  </CardContent>
-                </Card>
+                  </DashboardCard.Content>
+                </DashboardCard>
               )}
 
               <Savebar>

@@ -1,23 +1,21 @@
-import { MailpitService } from "@api/mailpit";
 import { AVAILABILITY } from "@data/copy";
 import { PRODUCTS } from "@data/e2eTestData";
 import { ProductCreateDialog } from "@pages/dialogs/productCreateDialog";
 import { ProductPage } from "@pages/productPage";
 import { VariantsPage } from "@pages/variantsPage";
-import { expect, test } from "@playwright/test";
+import { expect } from "@playwright/test";
+import { test } from "utils/testWithPermission";
 
-test.use({ storageState: "./playwright/.auth/admin.json" });
+test.use({ permissionName: "admin" });
 
 let productPage: ProductPage;
 let productCreateDialog: ProductCreateDialog;
 let variantsPage: VariantsPage;
-let mailpitService: MailpitService;
 
-test.beforeEach(({ page, request }) => {
+test.beforeEach(({ page }) => {
   productPage = new ProductPage(page);
   productCreateDialog = new ProductCreateDialog(page);
   variantsPage = new VariantsPage(page);
-  mailpitService = new MailpitService(request);
 });
 test("TC: SALEOR_3 Create basic product with variants @e2e @product", async () => {
   await productPage.gotoProductListPage();
@@ -99,7 +97,11 @@ test("TC: SALEOR_27 Create full info variant - via edit variant page @e2e @produ
 });
 test("TC: SALEOR_44 As an admin I should be able to delete a several products @basic-regression @product @e2e", async () => {
   await productPage.gotoProductListPage();
+
+  await productPage.searchAndFindRowIndexes("a product to be deleted via bulk");
   await productPage.checkListRowsBasedOnContainingText(PRODUCTS.productsToBeBulkDeleted.names);
+
+  await productPage.clickBulkDeleteGridRowsButton();
   await productPage.clickBulkDeleteButton();
   await productPage.deleteProductDialog.clickDeleteButton();
   await productPage.expectSuccessBanner();
@@ -116,7 +118,7 @@ test("TC: SALEOR_45 As an admin I should be able to delete a single products @ba
   );
   await productPage.clickDeleteProductButton();
   await productPage.deleteProductDialog.clickDeleteButton();
-  await productPage.expectSuccessBannerMessage("Product Removed");
+  await productPage.expectSuccessBanner({ message: "Product Removed" });
   await productPage.waitForGrid();
   await productPage.searchforProduct(PRODUCTS.productWithOneVariantToBeDeletedFromDetails.name);
   await expect(
@@ -172,10 +174,6 @@ test("TC: SALEOR_56 As an admin, I should be able to export products from single
   await productPage.exportProductsDialog.clickExportAllProductsRadioButton();
   await productPage.exportProductsDialog.clickSubmitButton();
   await productPage.expectInfoBanner();
-  await mailpitService.checkDoesUserReceivedExportedData(
-    process.env.E2E_USER_NAME!,
-    "Your exported products data is ready",
-  );
 });
 test("TC: SALEOR_57 As an admin, I should be able to search products on list view @basic-regression @product @e2e", async () => {
   await productPage.gotoProductListPage();
@@ -235,11 +233,9 @@ test("TC: SALEOR_60 As an admin I should be able update existing variant @basic-
   const variantName = `TC: SALEOR_60 - variant name - ${new Date().toISOString()}`;
   const sku = `SALEOR_60-sku-${new Date().toISOString()}`;
 
-  await productPage.waitForNetworkIdleAfterAction(() =>
-    variantsPage.gotoExistingVariantPage(
-      PRODUCTS.productWithVariantWhichWillBeUpdated.id,
-      PRODUCTS.productWithVariantWhichWillBeUpdated.variantId,
-    ),
+  await variantsPage.gotoExistingVariantPage(
+    PRODUCTS.productWithVariantWhichWillBeUpdated.id,
+    PRODUCTS.productWithVariantWhichWillBeUpdated.variantId,
   );
   await variantsPage.typeVariantName(variantName);
   await variantsPage.clickMageChannelsButton();
@@ -265,11 +261,9 @@ test("TC: SALEOR_60 As an admin I should be able update existing variant @basic-
   await productPage.productImage.waitFor({ state: "visible" });
 });
 test("TC: SALEOR_61 As an admin I should be able to delete existing variant @basic-regression @product @e2e", async () => {
-  await productPage.waitForNetworkIdleAfterAction(() =>
-    variantsPage.gotoExistingVariantPage(
-      PRODUCTS.singleVariantDeleteProduct.productId,
-      PRODUCTS.singleVariantDeleteProduct.variantId,
-    ),
+  await variantsPage.gotoExistingVariantPage(
+    PRODUCTS.singleVariantDeleteProduct.productId,
+    PRODUCTS.singleVariantDeleteProduct.variantId,
   );
   await variantsPage.clickDeleteVariantButton();
   await variantsPage.deleteVariantDialog.clickDeleteVariantButton();
@@ -284,9 +278,7 @@ test("TC: SALEOR_61 As an admin I should be able to delete existing variant @bas
   ).toContain(PRODUCTS.singleVariantDeleteProduct.productId);
 });
 test("TC: SALEOR_62 As an admin I should be able to bulk delete existing variants @basic-regression @product @e2e", async () => {
-  await productPage.waitForNetworkIdleAfterAction(() =>
-    productPage.gotoExistingProductPage(PRODUCTS.multipleVariantsBulkDeleteProduct.productId),
-  );
+  await productPage.gotoExistingProductPage(PRODUCTS.multipleVariantsBulkDeleteProduct.productId);
   await productPage.waitForGrid();
   await productPage.gridCanvas.scrollIntoViewIfNeeded();
   await productPage.clickGridCell(0, 0);

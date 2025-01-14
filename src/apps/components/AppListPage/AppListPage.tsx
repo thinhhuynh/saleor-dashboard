@@ -4,7 +4,7 @@ import { useHasManagedAppsPermission } from "@dashboard/hooks/useHasManagedAppsP
 import useNavigator from "@dashboard/hooks/useNavigator";
 import { sectionNames } from "@dashboard/intl";
 import { ListProps } from "@dashboard/types";
-import { Box, sprinkles, Text } from "@saleor/macaw-ui-next";
+import { Box, Skeleton, sprinkles, Text } from "@saleor/macaw-ui-next";
 import React, { useCallback } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 
@@ -13,6 +13,7 @@ import InstalledAppList from "../InstalledAppList";
 import { InstallWithManifestFormButton } from "../InstallWithManifestFormButton";
 import MarketplaceAlert from "../MarketplaceAlert";
 import { messages } from "./messages";
+import { MissingAppsFooter } from "./MissingAppsFooter";
 import { useStyles } from "./styles";
 import { AppListPageSections } from "./types";
 import {
@@ -64,6 +65,9 @@ export const AppListPage: React.FC<AppListPageProps> = props => {
     window.open(githubForkUrl, "_blank");
   }, []);
 
+  const showMissingAppsFooter =
+    !marketplaceError && verifiedInstallableMarketplaceApps && comingSoonMarketplaceApps;
+
   return (
     <>
       <TopNav title={intl.formatMessage(sectionNames.apps)}>
@@ -98,12 +102,16 @@ export const AppListPage: React.FC<AppListPageProps> = props => {
               >
                 <FormattedMessage {...messages.allApps} />
               </Text>
-              <AllAppList
-                appList={verifiedInstallableMarketplaceApps}
-                appInstallationList={appsInstallations}
-                navigateToAppInstallPage={navigateToAppInstallPage}
-                navigateToGithubForkPage={navigateToGithubForkPage}
-              />
+              {verifiedInstallableMarketplaceApps ? (
+                <AllAppList
+                  appList={verifiedInstallableMarketplaceApps}
+                  appInstallationList={appsInstallations}
+                  navigateToAppInstallPage={navigateToAppInstallPage}
+                  navigateToGithubForkPage={navigateToGithubForkPage}
+                />
+              ) : (
+                <Skeleton data-test-id="available-apps-loader" />
+              )}
             </Box>
           )}
           {sectionsAvailability.comingSoon && !marketplaceError && (
@@ -117,13 +125,18 @@ export const AppListPage: React.FC<AppListPageProps> = props => {
               >
                 {intl.formatMessage(messages.comingSoonApps)}
               </Text>
-              <AllAppList
-                appList={comingSoonMarketplaceApps}
-                appInstallationList={appsInstallations}
-              />
+              {comingSoonMarketplaceApps ? (
+                <AllAppList
+                  appList={comingSoonMarketplaceApps}
+                  appInstallationList={appsInstallations}
+                />
+              ) : (
+                <Skeleton data-test-id="upcoming-apps-loader" />
+              )}
             </Box>
           )}
         </Box>
+        {showMissingAppsFooter && <MissingAppsFooter />}
       </Box>
     </>
   );

@@ -2,12 +2,14 @@
 import ActionDialog from "@dashboard/components/ActionDialog";
 import CardSpacer from "@dashboard/components/CardSpacer";
 import { IMessage } from "@dashboard/components/messages";
+import { useGiftCardPermissions } from "@dashboard/giftCards/hooks/useGiftCardPermissions";
 import { useGiftCardUpdateMutation } from "@dashboard/graphql";
 import useForm from "@dashboard/hooks/useForm";
 import useNotifier from "@dashboard/hooks/useNotifier";
 import { DialogProps } from "@dashboard/types";
 import commonErrorMessages from "@dashboard/utils/errors/common";
-import { TextField, Typography } from "@material-ui/core";
+import { TextField } from "@material-ui/core";
+import { Text } from "@saleor/macaw-ui-next";
 import React from "react";
 import { useIntl } from "react-intl";
 
@@ -26,6 +28,7 @@ const GiftCardUpdateBalanceDialog: React.FC<DialogProps> = ({ open, onClose }) =
   const intl = useIntl();
   const classes = useStyles({});
   const notify = useNotifier();
+  const { canSeeCreatedBy } = useGiftCardPermissions();
   const {
     giftCard: {
       id,
@@ -62,6 +65,7 @@ const GiftCardUpdateBalanceDialog: React.FC<DialogProps> = ({ open, onClose }) =
         input: {
           balanceAmount,
         },
+        showCreatedBy: canSeeCreatedBy,
       },
     });
 
@@ -78,7 +82,6 @@ const GiftCardUpdateBalanceDialog: React.FC<DialogProps> = ({ open, onClose }) =
 
   return (
     <ActionDialog
-      maxWidth="sm"
       open={open}
       onConfirm={submit}
       confirmButtonLabel={intl.formatMessage(messages.changeButtonLabel)}
@@ -87,7 +90,7 @@ const GiftCardUpdateBalanceDialog: React.FC<DialogProps> = ({ open, onClose }) =
       confirmButtonState={status}
       disabled={loading}
     >
-      <Typography>{intl.formatMessage(messages.subtitle)}</Typography>
+      <Text>{intl.formatMessage(messages.subtitle)}</Text>
       <CardSpacer />
       <TextField
         inputProps={{ min: 0 }}
@@ -102,7 +105,9 @@ const GiftCardUpdateBalanceDialog: React.FC<DialogProps> = ({ open, onClose }) =
         InputProps={{
           startAdornment: (
             <div className={classes.currencyCodeContainer}>
-              <Typography variant="caption">{currency}</Typography>
+              <Text size={2} fontWeight="light">
+                {currency}
+              </Text>
             </div>
           ),
         }}

@@ -7,14 +7,13 @@ import {
 import { DashboardCard } from "@dashboard/components/Card";
 import PriceField from "@dashboard/components/PriceField";
 import ResponsiveTable from "@dashboard/components/ResponsiveTable";
-import Skeleton from "@dashboard/components/Skeleton";
 import TableRowLink from "@dashboard/components/TableRowLink";
 import { ProductChannelListingErrorFragment, ProductErrorFragment } from "@dashboard/graphql";
 import { renderCollection } from "@dashboard/misc";
 import { getFormChannelError, getFormChannelErrors, getFormErrors } from "@dashboard/utils/errors";
 import getProductErrorMessage from "@dashboard/utils/errors/product";
 import { TableBody, TableCell, TableHead } from "@material-ui/core";
-import { sprinkles, Text, vars } from "@saleor/macaw-ui-next";
+import { Skeleton, sprinkles, Text, vars } from "@saleor/macaw-ui-next";
 import React from "react";
 import { FormattedMessage, MessageDescriptor, useIntl } from "react-intl";
 
@@ -50,13 +49,15 @@ export const ProductVariantPrice: React.FC<ProductVariantPriceProps> = props => 
   if (disabled || !productVariantChannelListings.length) {
     return (
       <DashboardCard>
-        <DashboardCard.Title>
-          {intl.formatMessage({
-            id: "Xm9qOu",
-            defaultMessage: "Pricing",
-            description: "product pricing, section header",
-          })}
-        </DashboardCard.Title>
+        <DashboardCard.Header>
+          <DashboardCard.Title>
+            {intl.formatMessage({
+              id: "Xm9qOu",
+              defaultMessage: "Pricing",
+              description: "product pricing, section header",
+            })}
+          </DashboardCard.Title>
+        </DashboardCard.Header>
         <DashboardCard.Content>
           <Text size={2}>
             {intl.formatMessage(
@@ -75,13 +76,15 @@ export const ProductVariantPrice: React.FC<ProductVariantPriceProps> = props => 
 
   return (
     <DashboardCard>
-      <DashboardCard.Title>
-        {intl.formatMessage({
-          id: "Xm9qOu",
-          defaultMessage: "Pricing",
-          description: "product pricing, section header",
-        })}
-      </DashboardCard.Title>
+      <DashboardCard.Header>
+        <DashboardCard.Title>
+          {intl.formatMessage({
+            id: "Xm9qOu",
+            defaultMessage: "Pricing",
+            description: "product pricing, section header",
+          })}
+        </DashboardCard.Title>
+      </DashboardCard.Header>
       <ResponsiveTable>
         <TableHead>
           <TableRowLink>
@@ -145,7 +148,7 @@ export const ProductVariantPrice: React.FC<ProductVariantPriceProps> = props => 
                           priceApiError ? getProductErrorMessage(priceApiError, intl) : ""
                         }
                         name={fieldName}
-                        value={listing.price || ""}
+                        value={listing.price ?? ""}
                         currencySymbol={listing.currency}
                         onChange={e =>
                           onChange(listing.id, {
@@ -156,6 +159,7 @@ export const ProductVariantPrice: React.FC<ProductVariantPriceProps> = props => 
                         }
                         disabled={loading}
                         required
+                        data-test-id="price-field"
                       />
                     ) : (
                       <Skeleton />
@@ -169,7 +173,7 @@ export const ProductVariantPrice: React.FC<ProductVariantPriceProps> = props => 
                         })}
                         error={!!costPriceError}
                         name={`${listing.id}-channel-costPrice`}
-                        value={listing.costPrice || ""}
+                        value={listing.costPrice ?? ""}
                         currencySymbol={listing.currency}
                         onChange={e =>
                           onChange(listing.id, {
@@ -180,6 +184,7 @@ export const ProductVariantPrice: React.FC<ProductVariantPriceProps> = props => 
                         }
                         disabled={loading}
                         hint={costPriceError ? getProductErrorMessage(costPriceError, intl) : ""}
+                        data-test-id="cost-price-field"
                       />
                     ) : (
                       <Skeleton />

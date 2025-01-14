@@ -72,7 +72,9 @@ export class RightSideDetailsPage extends BasePage {
 
   async expectOptionsSelected(section: Locator, names: string[]) {
     for (const name of names) {
-      await expect(section.getByText(name)).toBeVisible({ timeout: 30000 });
+      await expect(section.getByText(name)).toBeVisible({
+        timeout: 30 * 1000, // 30 seconds
+      });
     }
   }
 
@@ -181,6 +183,11 @@ export class RightSideDetailsPage extends BasePage {
   async selectCustomer(customer = "allison.freeman@example.com") {
     await this.selectCustomerOption.locator(`text=${customer}`).click();
     await this.waitForDOMToFullyLoad();
+  }
+
+  async typeAndSelectCustomerEmail(customerEmail = "customer@example.com") {
+    await this.searchCustomerInput.fill(customerEmail);
+    await this.selectCustomerOption.locator(`text=${customerEmail}`).click();
   }
 
   async selectOneChannelAsAvailableWhenMoreSelected(channel: string) {

@@ -3,10 +3,11 @@ import { ConfigurationPage } from "@pages/configurationPage";
 import { AddNavigationMenuItemDialog } from "@pages/dialogs/addNavigationMenuItemDialog";
 import { NavigationDetailsPage } from "@pages/navigationDetailsPage";
 import { NavigationPage } from "@pages/navigationPage";
-import { expect, test } from "@playwright/test";
+import { expect } from "@playwright/test";
 import faker from "faker";
+import { test } from "utils/testWithPermission";
 
-test.use({ storageState: "playwright/.auth/admin.json" });
+test.use({ permissionName: "admin" });
 
 let navigation: NavigationPage;
 let navigationDetailsPage: NavigationDetailsPage;
@@ -41,10 +42,11 @@ test("TC: SALEOR_194 Should create a new menu navigation with menu item @navigat
   const menuItemName = faker.random.word();
 
   await addNavigationMenuItemDialog.typeMenuItemName(menuItemName);
-  await addNavigationMenuItemDialog.selectLinkOption("category", "Polo Shirts");
+  await addNavigationMenuItemDialog.selectLinkTypeOption("Categories");
+  await addNavigationMenuItemDialog.selectLinkTypeValue("Polo Shirts");
   await addNavigationMenuItemDialog.clickSaveButton();
   await expect(navigationDetailsPage.addMenuItemDialog).not.toBeVisible();
-  await navigationDetailsPage.expectSuccessBanner();
+  await navigation.expectSuccessBanner();
   await expect(navigationDetailsPage.menuNameInput).toHaveValue(menuName);
   await expect(navigationDetailsPage.menuItemList).toContainText(menuItemName);
 });
@@ -58,7 +60,8 @@ test("TC: SALEOR_198 Should update existing menu @navigation @e2e", async () => 
 
   await navigationDetailsPage.clickEditMenuItemButton(menuItemToBeUpdated.name);
   await addNavigationMenuItemDialog.typeMenuItemName(newItemName);
-  await addNavigationMenuItemDialog.selectLinkOption("category", "Polo Shirts");
+  await addNavigationMenuItemDialog.selectLinkTypeOption("Categories");
+  await addNavigationMenuItemDialog.selectLinkTypeValue("Polo Shirts");
   await addNavigationMenuItemDialog.clickSaveButton();
   await expect(navigationDetailsPage.addMenuItemDialog).not.toBeVisible();
   await navigationDetailsPage.clickDeleteMenuItemButton(menuItemToBeDeleted.name);
@@ -68,7 +71,8 @@ test("TC: SALEOR_198 Should update existing menu @navigation @e2e", async () => 
   const menuItemName = faker.random.word();
 
   await addNavigationMenuItemDialog.typeMenuItemName(menuItemName);
-  await addNavigationMenuItemDialog.selectLinkOption("category", "Polo Shirts");
+  await addNavigationMenuItemDialog.selectLinkTypeOption("Categories");
+  await addNavigationMenuItemDialog.selectLinkTypeValue("Polo Shirts");
   await addNavigationMenuItemDialog.clickSaveButton();
   await expect(navigationDetailsPage.menuItemList).toContainText(menuItemName);
   await navigationDetailsPage.clickDeleteMenuItemButton(menuItemName);
@@ -94,7 +98,7 @@ test("TC: SALEOR_197 Should remove existing menu from it's details page @navigat
   );
   await navigationDetailsPage.clickDeleteButton();
   await navigationDetailsPage.deleteDialog.clickDeleteButton();
-  await navigationDetailsPage.expectSuccessBanner();
+  await navigation.expectSuccessBanner();
   await expect(navigation.navigationList).not.toHaveText(
     NAVIGATION_ITEMS.navigationMenuToBeDeletedFromDetailsView.name,
   );
@@ -126,7 +130,7 @@ test("TC: SALEOR_196 Should bulk delete menus from the list @navigation @e2e", a
   }
   await navigation.clickBulkDeleteButton();
   await navigation.deleteDialog.clickDeleteButton();
-  await navigation.successBanner.waitFor({ state: "hidden" });
+  await navigation.expectSuccessBanner();
   await expect(navigation.navigationList).not.toHaveText(menusToBeBulkDeleted[0]);
   await expect(navigation.navigationList).not.toHaveText(menusToBeBulkDeleted[1]);
 });

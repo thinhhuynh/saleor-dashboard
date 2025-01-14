@@ -2,6 +2,8 @@ import { LOCATORS } from "@data/commonLocators";
 import type { Locator, Page } from "@playwright/test";
 import { expect } from "@playwright/test";
 
+import { SUCCESS_BANNER_TIMEOUT } from "../../playwright.config";
+
 export class BasePage {
   readonly page: Page;
 
@@ -18,7 +20,7 @@ export class BasePage {
     readonly errorBanner = page.locator(LOCATORS.errorBanner),
     readonly saveButton = page.locator(LOCATORS.saveButton),
     readonly infoBanner = page.locator(LOCATORS.infoBanner),
-    readonly loader = page.locator(LOCATORS.loader),
+    readonly dataGridLoader = page.locator(LOCATORS.dataGridLoader),
     readonly previousPagePaginationButton = page.getByTestId("button-pagination-back"),
     readonly rowNumberButton = page.getByTestId("PaginationRowNumberSelect"),
     readonly rowNumberOption = page.getByTestId("rowNumberOption"),
@@ -100,17 +102,21 @@ export class BasePage {
     await this.saveButton.click();
   }
 
-  async expectSuccessBannerMessage(msg: string) {
-    await this.successBanner.locator(`text=${msg}`).waitFor({ state: "visible", timeout: 10000 });
-    await expect(this.errorBanner, "No error banner should be visible").not.toBeVisible();
-  }
-
   async expectErrorBannerMessage(msg: string) {
     await this.errorBanner.locator(`text=${msg}`).waitFor({ state: "visible", timeout: 10000 });
   }
 
-  async expectSuccessBanner() {
-    await this.successBanner.first().waitFor({ state: "visible", timeout: 15000 });
+  async expectSuccessBanner(
+    options: { message?: string; timeout?: number } = { timeout: SUCCESS_BANNER_TIMEOUT },
+  ) {
+    if (options.message) {
+      await this.successBanner
+        .locator(`text=${options.message}`)
+        .waitFor({ state: "visible", timeout: options.timeout });
+    } else {
+      await this.successBanner.first().waitFor({ state: "visible", timeout: options.timeout });
+    }
+
     await expect(this.errorBanner, "No error banner should be visible").not.toBeVisible();
   }
 
@@ -265,14 +271,12 @@ export class BasePage {
     return await this.findRowIndexBasedOnText([searchItem]);
   }
 
-  // check row on grid list view
   async checkListRowsBasedOnContainingText(searchText: string[]) {
     const rowIndexes = await this.findRowIndexBasedOnText(searchText);
 
     for (const rowIndex of rowIndexes) {
       await this.clickGridCell(0, rowIndex);
     }
-    // make sure all searched texts were found and checked
     await expect(searchText.length).toEqual(rowIndexes.length);
   }
 
@@ -315,7 +319,6 @@ export class BasePage {
 
   async waitForDOMToFullyLoad() {
     await this.page.waitForLoadState("domcontentloaded", { timeout: 70000 });
-    await this.loader.waitFor({ state: "hidden" });
   }
 
   async expectElementIsHidden(locator: Locator) {
@@ -323,9 +326,14 @@ export class BasePage {
       state: "hidden",
       timeout: 30000,
     });
+    await this.waitForDOMToFullyLoad();
   }
 
   async waitForCanvasContainsText(text: string) {
     await this.gridCanvas.getByText(text).waitFor({ state: "attached", timeout: 50000 });
+  }
+
+  async waitForDatagridLoaderToDisappear() {
+    await this.dataGridLoader.waitFor({ state: "hidden" });
   }
 }

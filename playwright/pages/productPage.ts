@@ -20,8 +20,6 @@ export class ProductPage extends BasePage {
 
   readonly rightSideDetailsPage: RightSideDetailsPage;
 
-  readonly basePage: BasePage;
-
   readonly channelSelectDialog: ChannelSelectDialog;
 
   readonly deleteProductDialog: DeleteDialog;
@@ -78,7 +76,6 @@ export class ProductPage extends BasePage {
     readonly emptyDataGridListView = page.getByTestId("empty-data-grid-text"),
   ) {
     super(page);
-    this.basePage = new BasePage(page);
     this.exportProductsDialog = new ExportProductsDialog(page);
     this.deleteProductDialog = new DeleteDialog(page);
     this.channelSelectDialog = new ChannelSelectDialog(page);
@@ -136,7 +133,7 @@ export class ProductPage extends BasePage {
   }
 
   async clickBulkDeleteButton() {
-    await this.bulkDeleteButton.click();
+    await this.submitButton.click();
   }
 
   async addSeo() {
@@ -189,10 +186,6 @@ export class ProductPage extends BasePage {
     await this.saveButton.click();
   }
 
-  async expectSuccessBanner() {
-    await this.basePage.expectSuccessBanner();
-  }
-
   async clickCreateProductButton() {
     await this.createProductButton.click();
   }
@@ -211,7 +204,7 @@ export class ProductPage extends BasePage {
 
   async gotoProductListPage() {
     await this.page.goto(URL_LIST.products);
-    await this.waitForDOMToFullyLoad();
+    await this.waitForGrid();
   }
 
   async uploadProductImage(fileName: string) {

@@ -1,9 +1,10 @@
 // @ts-strict-ignore
-import NewActionDialog from "@dashboard/components/ActionDialog/NewActionDialog";
+import ActionDialog from "@dashboard/components/ActionDialog";
 import { useChannelsSearch } from "@dashboard/components/ChannelsAvailabilityDialog/utils";
 import { Combobox } from "@dashboard/components/Combobox";
 import ControlledCheckbox from "@dashboard/components/ControlledCheckbox";
 import { IMessage } from "@dashboard/components/messages";
+import { useGiftCardPermissions } from "@dashboard/giftCards/hooks/useGiftCardPermissions";
 import { useChannelsQuery, useGiftCardResendMutation } from "@dashboard/graphql";
 import useForm from "@dashboard/hooks/useForm";
 import useNotifier from "@dashboard/hooks/useNotifier";
@@ -11,11 +12,11 @@ import { getBySlug } from "@dashboard/misc";
 import { DialogProps } from "@dashboard/types";
 import commonErrorMessages from "@dashboard/utils/errors/common";
 import { mapSlugNodeToChoice } from "@dashboard/utils/maps";
-import { CircularProgress, TextField, Typography } from "@material-ui/core";
+import { TextField } from "@material-ui/core";
+import { Box, Spinner, Text } from "@saleor/macaw-ui-next";
 import React, { useEffect, useState } from "react";
 import { useIntl } from "react-intl";
 
-import { useGiftCardDeleteDialogContentStyles as useProgressStyles } from "../../components/GiftCardDeleteDialog/styles";
 import { useUpdateBalanceDialogStyles as useStyles } from "../GiftCardUpdateBalanceDialog/styles";
 import { getGiftCardErrorMessage } from "../messages";
 import useGiftCardDetails from "../providers/GiftCardDetailsProvider/hooks/useGiftCardDetails";
@@ -31,12 +32,14 @@ const GiftCardResendCodeDialog: React.FC<DialogProps> = ({ open, onClose }) => {
   const intl = useIntl();
   const notify = useNotifier();
   const classes = useStyles();
-  const progressClasses = useProgressStyles();
   const {
     giftCard: { boughtInChannel: initialChannelSlug },
   } = useGiftCardDetails();
+  const { canManageChannels } = useGiftCardPermissions();
   const [consentSelected, setConsentSelected] = useState(false);
-  const { data: channelsData, loading: loadingChannels } = useChannelsQuery({});
+  const { data: channelsData, loading: loadingChannels } = useChannelsQuery({
+    skip: !canManageChannels,
+  });
   const channels = channelsData?.channels;
   const activeChannels = channels?.filter(({ isActive }) => isActive);
   const { onQueryChange, filteredChannels } = useChannelsSearch(activeChannels);
@@ -93,8 +96,7 @@ const GiftCardResendCodeDialog: React.FC<DialogProps> = ({ open, onClose }) => {
   useEffect(reset, [consentSelected]);
 
   return (
-    <NewActionDialog
-      maxWidth="sm"
+    <ActionDialog
       open={open}
       onConfirm={submit}
       confirmButtonLabel={intl.formatMessage(messages.submitButtonLabel)}
@@ -104,12 +106,12 @@ const GiftCardResendCodeDialog: React.FC<DialogProps> = ({ open, onClose }) => {
       disabled={loading}
     >
       {loadingChannels ? (
-        <div className={progressClasses.progressContainer}>
-          <CircularProgress />
-        </div>
+        <Box display="flex" width="100%" justifyContent="center">
+          <Spinner />
+        </Box>
       ) : (
-        <>
-          <Typography>{intl.formatMessage(messages.description)}</Typography>
+        <Box display="grid" gap={2}>
+          <Text>{intl.formatMessage(messages.description)}</Text>
 
           <Combobox
             label={intl.formatMessage(messages.sendToChannelSelectLabel)}
@@ -117,7 +119,7 @@ const GiftCardResendCodeDialog: React.FC<DialogProps> = ({ open, onClose }) => {
             fetchOptions={onQueryChange}
             name="channelSlug"
             value={{
-              label: channels.find(getBySlug(data?.channelSlug))?.name,
+              label: channels?.find(getBySlug(data?.channelSlug))?.name,
               value: data?.channelSlug,
             }}
             onChange={change}
@@ -140,9 +142,9 @@ const GiftCardResendCodeDialog: React.FC<DialogProps> = ({ open, onClose }) => {
             className={classes.inputContainer}
             label={intl.formatMessage(messages.emailInputPlaceholder)}
           />
-        </>
+        </Box>
       )}
-    </NewActionDialog>
+    </ActionDialog>
   );
 };
 

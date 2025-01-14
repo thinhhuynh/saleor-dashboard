@@ -20,7 +20,6 @@ import { DetailPageLayout } from "@dashboard/components/Layouts";
 import { Metadata } from "@dashboard/components/Metadata/Metadata";
 import { Savebar } from "@dashboard/components/Savebar";
 import { SeoForm } from "@dashboard/components/SeoForm";
-import { Choice } from "@dashboard/components/SingleSelectField";
 import {
   ChannelFragment,
   PermissionEnum,
@@ -38,19 +37,21 @@ import {
   SearchProductsQuery,
   TaxClassBaseFragment,
 } from "@dashboard/graphql";
+import { useBackLinkWithState } from "@dashboard/hooks/useBackLinkWithState";
 import { SubmitPromise } from "@dashboard/hooks/useForm";
 import useNavigator from "@dashboard/hooks/useNavigator";
 import useStateFromProps from "@dashboard/hooks/useStateFromProps";
 import { maybe } from "@dashboard/misc";
 import ProductExternalMediaDialog from "@dashboard/products/components/ProductExternalMediaDialog";
 import { ProductOrganization } from "@dashboard/products/components/ProductOrganization/ProductOrganization";
+import { mapByChannel } from "@dashboard/products/components/ProductUpdatePage/utils";
 import { defaultGraphiQLQuery } from "@dashboard/products/queries";
-import { productImageUrl, productListUrl } from "@dashboard/products/urls";
+import { productImageUrl, productListPath, productListUrl } from "@dashboard/products/urls";
 import { ChoiceWithAncestors, getChoicesWithAncestors } from "@dashboard/products/utils/utils";
 import { ProductVariantListError } from "@dashboard/products/views/ProductUpdate/handlers/errors";
 import { UseProductUpdateHandlerError } from "@dashboard/products/views/ProductUpdate/handlers/useProductUpdateHandler";
 import { FetchMoreProps, RelayToFlat } from "@dashboard/types";
-import { Box } from "@saleor/macaw-ui-next";
+import { Box, Option } from "@saleor/macaw-ui-next";
 import React from "react";
 import { useIntl } from "react-intl";
 
@@ -98,7 +99,7 @@ export interface ProductUpdatePageProps {
   fetchReferenceProducts?: (data: string) => void;
   fetchAttributeValues: (query: string, attributeId: string) => void;
   refetch: () => Promise<any>;
-  onAttributeValuesSearch: (id: string, query: string) => Promise<Array<Choice<string, string>>>;
+  onAttributeValuesSearch: (id: string, query: string) => Promise<Option[]>;
   onAssignReferencesClick: (attribute: AttributeInput) => void;
   onCloseDialog: () => void;
   onImageDelete: (id: string) => () => void;
@@ -223,6 +224,9 @@ export const ProductUpdatePage: React.FC<ProductUpdatePageProps> = ({
     context.setVariables(`{ "id": "${product?.id}" }`);
     context.setDevModeVisibility(true);
   };
+  const backLinkProductUrl = useBackLinkWithState({
+    path: productListPath,
+  });
 
   return (
     <ProductUpdateForm
@@ -269,16 +273,10 @@ export const ProductUpdatePage: React.FC<ProductUpdatePageProps> = ({
           onChange: handlers.changeChannels,
           openModal: () => setChannelPickerOpen(true),
         };
-        const listings = data.channels.updateChannels?.map<ChannelData>(listing => {
-          const channel = channels?.find(ac => ac.id === listing.channelId);
 
-          return {
-            ...channel,
-            ...listing,
-            id: listing.channelId,
-            currency: channel.currencyCode,
-          };
-        });
+        const byChannel = mapByChannel(channels);
+        const listings = data.channels.updateChannels?.map<ChannelData>(byChannel);
+
         const entityType = getReferenceAttributeEntityTypeFromAttribute(
           assignReferencesAttributeId,
           data.attributes,
@@ -286,7 +284,7 @@ export const ProductUpdatePage: React.FC<ProductUpdatePageProps> = ({
 
         return (
           <DetailPageLayout>
-            <TopNav href={productListUrl()} title={header}>
+            <TopNav href={backLinkProductUrl} title={header}>
               <TopNav.Menu
                 items={[
                   ...extensionMenuItems,

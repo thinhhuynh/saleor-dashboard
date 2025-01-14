@@ -225,8 +225,8 @@
     "context": "section description",
     "string": "Strategy defines the preference of warehouses for stock allocations and reservations."
   },
-  "/Fa+RP": {
-    "string": "Couldn't load top products"
+  "/H9LeU": {
+    "string": "Explore Saleor App Store"
   },
   "/ILyIf": {
     "context": "tax classes menu header",
@@ -265,6 +265,10 @@
   "/WXs6H": {
     "context": "collection name",
     "string": "Name"
+  },
+  "/XGvYd": {
+    "context": "onboarding step description",
+    "string": "Webhooks are available in Saleor to both Local and External Apps. To create a Webhook you need to create a Local App first. You can do that in the Configuration > Webhooks & Events."
   },
   "/Xwjww": {
     "context": "button",
@@ -344,6 +348,9 @@
     "context": "order returned success message",
     "string": "Successfully returned products!"
   },
+  "0+zatS": {
+    "string": "Hello {userName}, welcome to your Store Dashboard"
+  },
   "01+5kQ": {
     "string": "Mark as paid"
   },
@@ -421,6 +428,10 @@
   "0XHXTZ": {
     "context": "column header",
     "string": "Title"
+  },
+  "0YjGFG": {
+    "context": "alert message",
+    "string": "For subscription"
   },
   "0a0fLZ": {
     "context": "countries list menu label when no countries are assigned",
@@ -537,6 +548,9 @@
   "19/lwV": {
     "string": "Determine attributes used to create product types"
   },
+  "19o9WS": {
+    "string": "Learn more about {userPermissions}"
+  },
   "1BNKCZ": {
     "context": "sale channel",
     "string": "Channel"
@@ -649,9 +663,6 @@
   "26BKkX": {
     "context": "order status",
     "string": "Partially returned"
-  },
-  "28GZnc": {
-    "string": "Start typing to begin search..."
   },
   "29L5Yq": {
     "context": "gift card not found message",
@@ -774,6 +785,10 @@
     "context": "card title",
     "string": "Refund balance"
   },
+  "2xkzcr": {
+    "context": "btn label",
+    "string": "Go to GraphQL Playground"
+  },
   "2yU+q9": {
     "context": "tab name",
     "string": "All Warehouses"
@@ -846,10 +861,6 @@
   "3TlhJS": {
     "context": "navigator command mode description",
     "string": "Search Command"
-  },
-  "3Z8972": {
-    "context": "product",
-    "string": "Stock quantity"
   },
   "3a5wL8": {
     "string": "Active"
@@ -934,9 +945,6 @@
     "context": "Transaction capture button - charge preauthorized transaction amount",
     "string": "Capture"
   },
-  "450Fty": {
-    "string": "None"
-  },
   "45aV8u": {
     "context": "gift card bulk create modal bottom explanation",
     "string": "After creation Saleor will create a list of gift card codes that you will be able to download."
@@ -971,6 +979,10 @@
   "4EdlF/": {
     "context": "datagrid title label",
     "string": "Select transaction to refund"
+  },
+  "4IawKc": {
+    "context": "onboarding step description",
+    "string": "Go to all orders where you can create an fulfilment and refund and review corresponding statuses. View the order in GraphQL"
   },
   "4IgzXs": {
     "context": "label",
@@ -1011,10 +1023,6 @@
   "4W/CKn": {
     "context": "modal button",
     "string": "Upload URL"
-  },
-  "4XRIV5": {
-    "context": "add new refund button",
-    "string": "Add new refund"
   },
   "4XhJY+": {
     "context": "dialog header",
@@ -1129,6 +1137,9 @@
     "context": "vat not included in order price",
     "string": "does not apply"
   },
+  "5M+hLZ": {
+    "string": "User permissions"
+  },
   "5O8EIz": {
     "context": "Authorize transactions instead of charging",
     "string": "Authorize transactions instead of charging"
@@ -1157,6 +1168,10 @@
   "5TUpjG": {
     "context": "product attribute entity type",
     "string": "Products"
+  },
+  "5TzisG": {
+    "context": "btn label",
+    "string": "Go to Webhooks"
   },
   "5Vwnu+": {
     "string": "You have reached your SKU limit, you will be no longer able to add SKUs to your store. If you would like to up your limit, contact your administration staff about raising your limits."
@@ -1321,10 +1336,6 @@
   "6WRFp2": {
     "context": "order history message",
     "string": "Note was added to the order"
-  },
-  "6Y1nQd": {
-    "context": "product is visible",
-    "string": "Visible"
   },
   "6aBkJm": {
     "context": "section header",
@@ -1611,6 +1622,9 @@
     "context": "service accounts section name",
     "string": "Service Accounts"
   },
+  "91vQMc": {
+    "string": "order management"
+  },
   "945a4a": {
     "context": "column header",
     "string": "Customer e-mail"
@@ -1793,6 +1807,10 @@
   "A+g/VP": {
     "string": "Unsaved preset"
   },
+  "A02NDR": {
+    "context": "plain text attribute value was truncated",
+    "string": "Attribute value too long and truncated at {length} characters."
+  },
   "A0Wlg7": {
     "context": "product discount removed title",
     "string": "{productName} discount was removed by"
@@ -1956,8 +1974,18 @@
     "context": "dialog header",
     "string": "Unassign Categories From Sale"
   },
+  "B8PvdI": {
+    "string": "extending Saleor with Webhooks"
+  },
   "B9yrkK": {
     "string": "No Channels found"
+  },
+  "BA4leV": {
+    "string": "API guide"
+  },
+  "BBt3jD": {
+    "context": "btn label",
+    "string": "Invite members"
   },
   "BCPrmK": {
     "context": "order history message",
@@ -2019,6 +2047,10 @@
     "context": "sale status",
     "string": "Scheduled"
   },
+  "BaxGjT": {
+    "context": "variant stocks section subtitle",
+    "string": "Assigning the stocks will be possible after the variant is saved."
+  },
   "BbP+k3": {
     "context": "variant availability in channel",
     "string": "Available"
@@ -2060,16 +2092,12 @@
   "BvGp1I": {
     "string": "between"
   },
-  "Bx367s": {
-    "context": "product is hidden",
-    "string": "Hidden"
-  },
-  "By5ZBp": {
-    "context": "header",
-    "string": "Hello there, {userName}"
-  },
   "ByYtFB": {
     "string": "Invalid or expired token. Please check your token in URL"
+  },
+  "C+WD8j": {
+    "context": "alert message",
+    "string": "all of"
   },
   "C035fF": {
     "context": "grant refund, refund card explanation next to submit button",
@@ -2093,6 +2121,10 @@
     "context": "button",
     "string": "Add products"
   },
+  "C5gcqL": {
+    "context": "btn label",
+    "string": "Mark as done"
+  },
   "C6bb6x": {
     "context": "order refund amount",
     "string": "Refund total amount"
@@ -2107,6 +2139,9 @@
   "C90nKP": {
     "context": "error with deactivatation alert message",
     "string": "Errors deactivating gift {count,plural,one{card} other{cards}}"
+  },
+  "C9cgck": {
+    "string": "Learn more about {productConfigurations}"
   },
   "C9pcQx": {
     "context": "dialog content",
@@ -2167,6 +2202,9 @@
   },
   "CZmloB": {
     "string": "Fulfillment successfully updated"
+  },
+  "Cc3Z40": {
+    "string": "Learn Saleor checkout process flow"
   },
   "CcEwXH": {
     "context": "dialog header",
@@ -2269,6 +2307,10 @@
   },
   "DGCzal": {
     "string": "This token gives you access to your shop's API, which you'll find here: {url}"
+  },
+  "DGWVA9": {
+    "context": "variant created error message",
+    "string": "Variant creation failed"
   },
   "DHBlFi": {
     "context": "navigator customer mode description",
@@ -2375,6 +2417,10 @@
     "context": "no card defuned alert message",
     "string": "You haven’t defined a gift card product!"
   },
+  "E4GW+N": {
+    "context": "fully paid checkout automatically completed message",
+    "string": "Order created automatically from fully paid checkout"
+  },
   "E54eoT": {
     "string": "Creating the navigation structure is done by dragging and dropping. Simply create a new menu item and then drag it into its destined place. You can move items inside one another to create a tree structure and drag items up and down to create a hierarchy"
   },
@@ -2417,6 +2463,10 @@
     "context": "checkbox",
     "string": "Refund shipment costs"
   },
+  "EQfaUv": {
+    "context": "onboarding step title",
+    "string": "Check our GraphQL playground & make an API call"
+  },
   "ER/yBq": {
     "context": "max price in channel",
     "string": "Max. value"
@@ -2444,6 +2494,9 @@
   "EbVf0Z": {
     "context": "transaction reference",
     "string": "Transaction reference"
+  },
+  "EcglP9": {
+    "string": "Key"
   },
   "Ediw6/": {
     "context": "button label",
@@ -2604,6 +2657,10 @@
   "FTYkgw": {
     "string": "Delete collections"
   },
+  "FWaL+x": {
+    "context": "gift card history message",
+    "string": "Gift card balance was reset"
+  },
   "FWbv/u": {
     "context": "page header",
     "string": "Create Discount"
@@ -2678,6 +2735,9 @@
   },
   "FuAV5G": {
     "string": "This name is already taken. Please provide another."
+  },
+  "FvmV6q": {
+    "string": "Discord"
   },
   "Fvvgoi": {
     "string": "Your session has expired. Please log in again to continue."
@@ -2755,6 +2815,10 @@
   "GFJabu": {
     "context": "dialog header",
     "string": "Delete Variant"
+  },
+  "GFkb2t": {
+    "context": "automatically complete checkouts checkbox label",
+    "string": "Automatically complete checkouts when fully paid"
   },
   "GJAX0z": {
     "context": "order history message",
@@ -2867,6 +2931,9 @@
   "GsBRWL": {
     "string": "Languages"
   },
+  "GufXy5": {
+    "string": "Value"
+  },
   "GuihaP": {
     "context": "order transaction refund summary label",
     "string": "Shipping"
@@ -2902,6 +2969,10 @@
     "context": "VariantDetailsChannelsAvailabilityCard item subtitle published",
     "string": "Published since {getPublishedAt}"
   },
+  "H1L1cc": {
+    "context": "url",
+    "string": "URL"
+  },
   "H27/Gy": {
     "context": "error message",
     "string": "Maximum weight cannot be lower than minimum"
@@ -2925,6 +2996,10 @@
   "H6NsC1": {
     "context": "pages section name",
     "string": "Pages"
+  },
+  "HADMte": {
+    "context": "onboarding step title",
+    "string": "Explore orders"
   },
   "HAlOn1": {
     "string": "Name"
@@ -2954,6 +3029,10 @@
   "HR9OTW": {
     "context": "staff member's account",
     "string": "Active"
+  },
+  "HRXLYk": {
+    "context": "cta button label",
+    "string": "Get in touch"
   },
   "HSmg1/": {
     "context": "gift cards section name",
@@ -3051,6 +3130,10 @@
     "context": "is filter range or value",
     "string": "equal to"
   },
+  "I/y4IU": {
+    "context": "alert message",
+    "string": "one of"
+  },
   "I1Mz7h": {
     "string": "Manage Collection Channel Availability"
   },
@@ -3077,6 +3160,10 @@
   "ICeshC": {
     "context": "product type",
     "string": "Shippable"
+  },
+  "IDwsCU": {
+    "context": "onboarding step title",
+    "string": "Create a new product"
   },
   "IEpmGQ": {
     "context": "description",
@@ -3292,10 +3379,6 @@
     "context": "csv file exporting has finished, header",
     "string": "Exporting CSV finished"
   },
-  "JUQwne": {
-    "context": "order",
-    "string": "Gift Card"
-  },
   "JV+EiM": {
     "context": "voucher value",
     "string": "Value"
@@ -3307,10 +3390,6 @@
   "JXRYQg": {
     "context": "button",
     "string": "Create Menu"
-  },
-  "JYvf8/": {
-    "context": "is preorder",
-    "string": "Preorder"
   },
   "Ja7gHc": {
     "context": "button",
@@ -3420,6 +3499,9 @@
     "context": "tooltip",
     "string": "This feature is in a preview state and can be subject to changes at later point"
   },
+  "KHI/qv": {
+    "string": "You don't have permission to manage products"
+  },
   "KHZlmi": {
     "string": "Discount Type"
   },
@@ -3468,10 +3550,6 @@
     "context": "quantity of fulfilled products",
     "string": "Quantity to fulfill"
   },
-  "Kgxlsf": {
-    "context": "order",
-    "string": "Paid with Gift Card"
-  },
   "KkufwD": {
     "string": "No voucher codes found"
   },
@@ -3493,6 +3571,10 @@
   "KupNHw": {
     "context": "product field",
     "string": "Category"
+  },
+  "Kv58Rx": {
+    "context": "default gift card delete description",
+    "string": "{selectedItemsCount,plural,one{Are you sure you want to delete this gift card?} other{Are you sure you want to delete {selectedItemsCount} gift cards?}}"
   },
   "Kw0jHS": {
     "context": "created products counter",
@@ -3923,6 +4005,10 @@
     "context": "weight",
     "string": "{value} {unit}"
   },
+  "Ntk3CQ": {
+    "context": "footer title",
+    "string": "Missing something?"
+  },
   "Nv/toB": {
     "context": "button",
     "string": "Assign and save"
@@ -3942,6 +4028,10 @@
   "NxeDbG": {
     "context": "image upload",
     "string": "Drop here to upload"
+  },
+  "Nyxzpe": {
+    "context": "onboarding step description",
+    "string": "Saleor includes a GraphQL Playground, an interactive GraphQL editor, allowing access to your Saleor instance's API through the web browser. The Playground lets you quickly familiarize yourself with the API, perform example operations, and send your first queries and mutations."
   },
   "NzifUg": {
     "context": "window title",
@@ -4161,6 +4251,10 @@
     "context": "window title",
     "string": "Create Product"
   },
+  "PaQFmR": {
+    "context": "onboarding step title",
+    "string": "Welcome to Dashboard!"
+  },
   "PbqNhi": {
     "context": "order status",
     "string": "Partially fulfilled"
@@ -4224,10 +4318,6 @@
   },
   "Pyjarj": {
     "string": "This shipping rate has no postal codes assigned"
-  },
-  "PzXIXh": {
-    "context": "order",
-    "string": "Customer"
   },
   "Q/Nbku": {
     "context": "product field",
@@ -4410,6 +4500,10 @@
   "QqnNUm": {
     "string": "Visible in listing"
   },
+  "QslFl8": {
+    "context": "add new refund button",
+    "string": "New refund"
+  },
   "QzseV7": {
     "context": "dialog header",
     "string": "Delete Menu"
@@ -4417,6 +4511,12 @@
   "R98JLZ": {
     "context": "OrderCustomer Fulfillment from All Warehouses",
     "string": "Fulfill from All Warehouses"
+  },
+  "RABrGb": {
+    "string": "Save hours of evaluating Saleor on your own by speaking with our solution engineer."
+  },
+  "RBkNPr": {
+    "string": "Full coverage of advanced checkout cases like split payments, split fulfillments, and orchestrated payments."
   },
   "RBxYJf": {
     "context": "sale status",
@@ -4536,6 +4636,10 @@
     "context": "order does not require shipping",
     "string": "does not apply"
   },
+  "RyZd9J": {
+    "context": "error message",
+    "string": "Please wait a moment before trying again."
+  },
   "Ryh3iR": {
     "context": "header",
     "string": "Create Webhook"
@@ -4565,10 +4669,6 @@
   "S5/nSq": {
     "context": "grant refund table, column header",
     "string": "Quantity"
-  },
-  "S52JMl": {
-    "context": "default gift card delete description",
-    "string": "{selectedItemsCount,plural,one{Are you sure you want to delete this gift card?} other{Are you sure you want to delete {selectedItemsCount} giftCards?}}"
   },
   "S7Rwl0": {
     "context": "stock exceeded action question label",
@@ -4662,10 +4762,6 @@
   "Sjd7wm": {
     "context": "product filter label",
     "string": "Product"
-  },
-  "Sna+WK": {
-    "context": "product status",
-    "string": "Out Of Stock"
   },
   "SpngiS": {
     "context": "sale status",
@@ -4840,6 +4936,9 @@
     "context": "PageTypeDeleteWarningDialog with items multiple description",
     "string": "You are about to delete multiple page types. Some of them are assigned to pages. Deleting those page types will also delete those pages"
   },
+  "Tp5T7U": {
+    "string": "Join our OS community of industry experts and learn more about open source at Saleor."
+  },
   "TpPx7V": {
     "context": "navigator placeholder",
     "string": "Search Customer"
@@ -4969,10 +5068,6 @@
   "Uo5MoU": {
     "context": "product field",
     "string": "Variant Images"
-  },
-  "Urh2N3": {
-    "context": "label",
-    "string": "Link"
   },
   "Us9cA1": {
     "context": "profit margin",
@@ -5132,6 +5227,10 @@
   "VkYZQ8": {
     "string": "Current Permissions"
   },
+  "VlDG1B": {
+    "context": "Request integration",
+    "string": "Request integration"
+  },
   "VmMDLN": {
     "context": "permission list item description",
     "string": "This group is last source of that permission"
@@ -5203,6 +5302,10 @@
   "WCg2GZ": {
     "context": "change warehouse dialog search placeholder",
     "string": "Search warehouses"
+  },
+  "WDrC7e": {
+    "context": "label",
+    "string": "Link value"
   },
   "WDy0tF": {
     "context": "section header",
@@ -5294,6 +5397,9 @@
   "WigK1f": {
     "context": "helper text",
     "string": "All items refunded"
+  },
+  "Wk00wL": {
+    "string": "Join the open source community"
   },
   "WkxE8/": {
     "context": "percentage or fixed, header",
@@ -5449,6 +5555,9 @@
     "context": "section header",
     "string": "All Media"
   },
+  "XVQpjm": {
+    "string": "Add new functionalities on top of Saleor and integrate it with third-party services. They can be installed, managed, and rendered in here in Saleor Dashboard."
+  },
   "XVuPMw": {
     "string": "Are you sure you want to delete this rule?"
   },
@@ -5463,6 +5572,10 @@
   "XZR590": {
     "context": "sale value",
     "string": "Value"
+  },
+  "XZpRr8": {
+    "context": "btn label",
+    "string": "Go to all products"
   },
   "Xb6BJ9": {
     "context": "error message",
@@ -5803,8 +5916,15 @@
     "context": "note input subtitle",
     "string": "Why was this gift card issued. This note will not be shown to the customer. Note will be stored in gift card history"
   },
+  "Zvo5iu": {
+    "string": "API reference"
+  },
   "Zz67wc": {
     "string": "View and update your webhooks and events."
+  },
+  "a+WuZg": {
+    "context": "cta button label",
+    "string": "View Documentation"
   },
   "a+iRI1": {
     "context": "single gift card title",
@@ -5818,6 +5938,10 @@
     "context": "select option, button",
     "string": "Select"
   },
+  "a/JR9Y": {
+    "context": "sale type order discount",
+    "string": "Sale"
+  },
   "a/QJBx": {
     "context": "user action bar",
     "string": "Action"
@@ -5825,10 +5949,6 @@
   "a1uffz": {
     "context": "draft created from replace products list title",
     "string": "Products replaced"
-  },
-  "a4qX2+": {
-    "context": "order",
-    "string": "Created"
   },
   "a55zOn": {
     "context": "section header",
@@ -5852,10 +5972,6 @@
   "aCJwVq": {
     "context": "warehouse",
     "string": "Name"
-  },
-  "aCX8rl": {
-    "context": "subheader",
-    "string": "Here is some information we gathered about your store"
   },
   "aEc9Ar": {
     "context": "gift card history message",
@@ -5917,6 +6033,10 @@
   "aZDHYr": {
     "context": "price rates info",
     "string": "This rate will apply to all orders"
+  },
+  "aasX8r": {
+    "context": "label",
+    "string": "Link type"
   },
   "abTH5q": {
     "context": "error message",
@@ -6093,10 +6213,6 @@
   "bh9+8A": {
     "context": "voucher requirement",
     "string": "Minimal order value"
-  },
-  "biAxKR": {
-    "context": "click and collect",
-    "string": "Click&Collect"
   },
   "biDgQS": {
     "context": "button, opens modal to create transaction in order",
@@ -6318,6 +6434,9 @@
     "context": "volume units types",
     "string": "Volume"
   },
+  "d+qgix": {
+    "string": "Next step"
+  },
   "d1PvC8": {
     "context": "checkbox",
     "string": "Grant refund for returned items"
@@ -6348,10 +6467,6 @@
   "dHAwu8": {
     "string": "Code already exists"
   },
-  "dJQxHt": {
-    "context": "delete category",
-    "string": "Are you sure you want to delete {categoryName}?"
-  },
   "dJVXIb": {
     "context": "vat included in order price",
     "string": "VAT included"
@@ -6381,6 +6496,9 @@
     "context": "edit tracking button",
     "string": "Edit tracking"
   },
+  "dVk241": {
+    "string": "product configurations"
+  },
   "dWK/Ck": {
     "string": "Choose countries, you want voucher to be limited to, from the list below"
   },
@@ -6390,10 +6508,6 @@
   "dc5KWn": {
     "context": "products export type label",
     "string": "products"
-  },
-  "diOQm7": {
-    "context": "product status",
-    "string": "Available"
   },
   "dnbJKr": {
     "string": "This transaction doesn't have any events"
@@ -6412,10 +6526,6 @@
   "e/61NZ": {
     "context": "current balance filter label",
     "string": "Current balance"
-  },
-  "e08xWz": {
-    "context": "header",
-    "string": "Top products"
   },
   "e0RKe+": {
     "context": "generate invoice button",
@@ -6495,6 +6605,10 @@
   "eWcvOc": {
     "context": "button",
     "string": "Choose file"
+  },
+  "eWrHmu": {
+    "context": "onboarding step title",
+    "string": "View webhooks functionalities"
   },
   "egBBQ/": {
     "context": "all captured amount from transactions in order",
@@ -6684,10 +6798,6 @@
     "context": "product organization, header",
     "string": "Organization"
   },
-  "fzDI3A": {
-    "context": "add link to navigation",
-    "string": "Link to: {url}"
-  },
   "fzk04H": {
     "context": "dialog title",
     "string": "Delete image"
@@ -6698,10 +6808,6 @@
   },
   "fzpXvv": {
     "string": "Are you sure you want to remove {email} avatar?"
-  },
-  "g+GAf4": {
-    "context": "product visibility",
-    "string": "Visibility"
   },
   "g/BrOt": {
     "string": "Url has invalid format"
@@ -6720,6 +6826,13 @@
   "g6yuk2": {
     "context": "export items to csv file, choice field label",
     "string": "Export information for:"
+  },
+  "g8lXTL": {
+    "context": "swatch attribute",
+    "string": "Swatch"
+  },
+  "g9HrbF": {
+    "string": "Need technical help?"
   },
   "g9Mb+U": {
     "context": "change warehouse dialog title",
@@ -6814,12 +6927,12 @@
   "grkY2V": {
     "string": "You don't have access to any channels"
   },
+  "gt05TH": {
+    "context": "tooltip message",
+    "string": "You don't have permission to manage staff"
+  },
   "gvOzOl": {
     "string": "Page Title"
-  },
-  "gx4wCT": {
-    "context": "swatch attribute type",
-    "string": "Swatch"
   },
   "gx6b6x": {
     "context": "search shortcut",
@@ -6875,6 +6988,10 @@
   "hHOI7D": {
     "context": "product type name",
     "string": "Type Name"
+  },
+  "hIh8bm": {
+    "context": "automatically complete checkouts checkbox description",
+    "string": "When enabled, checkouts detected as fully paid will be completed automatically, without checkoutComplete mutation. ({link})"
   },
   "hJDnLg": {
     "context": "section header",
@@ -6963,6 +7080,10 @@
     "context": "table head",
     "string": "Collection Name"
   },
+  "htGz4h": {
+    "context": "onboarding step description",
+    "string": "Invite team members and assign permissions on Product Information Management (PIM), Order Management System (OMS), Promotions engine, Integrations (Apps)"
+  },
   "htvX+Z": {
     "string": "Deny"
   },
@@ -7022,6 +7143,10 @@
   "iFM716": {
     "context": "grant refund, refund card subtitle",
     "string": "How much money do you want to return to the customer for the order?"
+  },
+  "iIPThY": {
+    "context": "onboarding title",
+    "string": "Let’s Get Started ({count}/{total})"
   },
   "iIfq2+": {
     "context": "Transaction cancel button - return preauthorized amount to client",
@@ -7088,6 +7213,10 @@
   "imYxM9": {
     "context": "header",
     "string": "App Information"
+  },
+  "ipbT0Q": {
+    "context": "btn label",
+    "string": "Mark all as done"
   },
   "isM94c": {
     "context": "create service token, button",
@@ -7156,9 +7285,6 @@
   "jGGnSZ": {
     "context": "page header",
     "string": "Primary Address"
-  },
-  "jHJmjf": {
-    "string": "No results"
   },
   "jMzyU8": {
     "context": "tax classes card header",
@@ -7438,9 +7564,21 @@
     "context": "dialog title",
     "string": "Capture manual transaction"
   },
+  "kv3FWU": {
+    "context": "btn label",
+    "string": "Go to orders"
+  },
   "kvSYZh": {
     "context": "replacement created order history message description",
     "string": "was created for replaced products"
+  },
+  "kyNv+Y": {
+    "context": "footer description",
+    "string": "Are we missing an integration your project requires? Let us know here"
+  },
+  "l0a2tU": {
+    "context": "onboarding step description",
+    "string": "Go to all products from where you can create a new product and view it in all product list. View the product in GraphQL"
   },
   "l1/Hwb": {
     "context": "invalid date in expirydate field header",
@@ -7453,6 +7591,10 @@
   "l3iOju": {
     "context": "transaction event type, transaction was refunded to client",
     "string": "Refund"
+  },
+  "l4o0ar": {
+    "context": "voucher type order discount",
+    "string": "Voucher: {voucherName}"
   },
   "l5V0QT": {
     "context": "boolean attribute type",
@@ -7493,10 +7635,6 @@
   "lHccsy": {
     "context": "table head",
     "string": "Variant Name"
-  },
-  "lJP1iw": {
-    "context": "order",
-    "string": "Channel"
   },
   "lJXkFS": {
     "context": "discount name",
@@ -7560,6 +7698,10 @@
   "lfXze9": {
     "string": "Delete vouchers"
   },
+  "lhfPkc": {
+    "context": "variant stocks section subtitle",
+    "string": "Assigning the stocks will be possible after the product is saved."
+  },
   "li1BBk": {
     "context": "export items as csv file",
     "string": "Plain CSV file"
@@ -7578,6 +7720,10 @@
   "lnteBJ": {
     "context": "country rates list label for the default rate",
     "string": "Country default rate"
+  },
+  "loEfAh": {
+    "context": "onboarding completed message",
+    "string": "Onboarding completed 🎉"
   },
   "lqIzC8": {
     "string": "This field needs to be unique"
@@ -7645,6 +7791,10 @@
   "mTEqYL": {
     "context": "NoChannels content",
     "string": "No channels to assign. Please first assign them for the product."
+  },
+  "mU695h": {
+    "context": "onboarding step description",
+    "string": "We’ll guide you through the main features so you can start customizing your store. Explore products, orders, collections, customers, and discounts to get familiar with key functions and concepts."
   },
   "mWQt3s": {
     "string": "No. of Products"
@@ -7750,10 +7900,6 @@
   "nHmugP": {
     "context": "order history message",
     "string": "Fulfilled {quantity} items"
-  },
-  "nII/qB": {
-    "context": "number of ordered products",
-    "string": "{amount, plural,one {One ordered}other {{amount} ordered}}"
   },
   "nIrjSR": {
     "context": "section header",
@@ -7990,6 +8136,10 @@
     "context": "unassign products from shipping rate and save, button",
     "string": "Unassign and save"
   },
+  "p/m4dD": {
+    "context": "onboarding step title",
+    "string": "Invite staff members"
+  },
   "p12BmC": {
     "context": "transaction refund tiles disabled transaction",
     "string": "This transaction is non-refundable."
@@ -8024,10 +8174,6 @@
   },
   "pAwBtz": {
     "string": "Reward value"
-  },
-  "pBTTtU": {
-    "context": "product kind",
-    "string": "Product Kind"
   },
   "pC6/1z": {
     "string": "Invalid manifest format"
@@ -8083,10 +8229,6 @@
   },
   "paa4m0": {
     "string": "Successfully created product type"
-  },
-  "pbGIUg": {
-    "context": "sales channel",
-    "string": "Channel"
   },
   "phAZoj": {
     "string": "Collection"
@@ -8278,6 +8420,10 @@
     "context": "dialog title",
     "string": "Delete Token"
   },
+  "qzDwLa": {
+    "context": "Invalid url value",
+    "string": "Invalid URL"
+  },
   "r+8q4B": {
     "context": "error message",
     "string": "Only draft orders can be edited"
@@ -8429,10 +8575,6 @@
     "context": "limit voucher",
     "string": "Limit of Uses"
   },
-  "s5v6m0": {
-    "context": "order",
-    "string": "Gift Card ordered"
-  },
   "s6lW8R": {
     "context": "option label",
     "string": "Change address"
@@ -8448,10 +8590,6 @@
   "s9sOcC": {
     "context": "button",
     "string": "OK"
-  },
-  "sEjRyz": {
-    "context": "voucher type order discount",
-    "string": "Voucher"
   },
   "sFynTT": {
     "context": "grant refund, refund card title",
@@ -8556,6 +8694,9 @@
     "context": "variant pricing section subtitle",
     "string": "There is no channel to define prices for. You need to first add variant to channels to define prices."
   },
+  "swOKYO": {
+    "string": "Discover the latest enhancements, new features, fixes, and performance improvements that make your dashboard experience even better."
+  },
   "szXISP": {
     "context": "permission group name",
     "string": "Permission Group Name"
@@ -8637,6 +8778,9 @@
   },
   "tiY7bx": {
     "string": "Add new product"
+  },
+  "tl1/1E": {
+    "string": "Learn more about {orderManagement}"
   },
   "tlGXkh": {
     "context": "input description",
@@ -9099,6 +9243,9 @@
   "wNQzS/": {
     "string": "The primary address of this customer."
   },
+  "wO9wb5": {
+    "string": "GitHub"
+  },
   "wOeIR4": {
     "context": "order history message",
     "string": "Restocked {quantity} items"
@@ -9187,6 +9334,10 @@
   },
   "x0n6YG": {
     "string": "This refund is currently being processed and cannot be edited"
+  },
+  "x0wum5": {
+    "context": "home sidebar card title",
+    "string": "Your store info"
   },
   "x2mg39": {
     "context": "Transaction event description",
@@ -9286,6 +9437,9 @@
   "xo5UIb": {
     "context": "dialog title",
     "string": "Delete category"
+  },
+  "xol6jX": {
+    "string": "You don't have permission to manage orders"
   },
   "xoyCZ/": {
     "context": "error message",
@@ -9480,6 +9634,9 @@
   "z9c6/C": {
     "string": "Deprecated"
   },
+  "z9f2oQ": {
+    "string": "Recent Dashboard Updates"
+  },
   "z9wQ/U": {
     "context": "no variant stock in warehouse",
     "string": "No Stock"
@@ -9519,6 +9676,9 @@
     "context": "select all channels label",
     "string": "Select All Channels"
   },
+  "zRIsjN": {
+    "string": "Learn more about {apiReference} and view {apiGuide}"
+  },
   "zRrcOG": {
     "context": "order history message",
     "string": "Order was cancelled"
@@ -9528,6 +9688,9 @@
   },
   "zSOvI0": {
     "string": "Filters"
+  },
+  "zT1CvH": {
+    "string": "Learn more about {extendingSaleor}"
   },
   "zWM89r": {
     "context": "numeric attribute units of",
@@ -9595,12 +9758,20 @@
     "context": "product available for purchase date",
     "string": "Will become available on {date}"
   },
+  "zp9VHt": {
+    "context": "cta button label",
+    "string": "Explore Updates"
+  },
   "zqarUF": {
     "context": "modal information under title",
     "string": "Select an address you want to use from the list below"
   },
   "ztQgD8": {
     "string": "No attributes found"
+  },
+  "ztvvcm": {
+    "context": "swatch attribute type",
+    "string": "Swatch type"
   },
   "zxs6G3": {
     "string": "Manage how you ship out orders"

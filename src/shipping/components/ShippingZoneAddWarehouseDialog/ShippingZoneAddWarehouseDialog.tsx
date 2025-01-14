@@ -3,7 +3,7 @@ import CompanyAddressForm from "@dashboard/components/CompanyAddressInput/Compan
 import { ConfirmButton, ConfirmButtonTransitionState } from "@dashboard/components/ConfirmButton";
 import Form from "@dashboard/components/Form";
 import Hr from "@dashboard/components/Hr";
-import { DASHBOARD_MODAL_WIDTH, DashboardModal } from "@dashboard/components/Modal";
+import { DashboardModal } from "@dashboard/components/Modal";
 import { AddressTypeInput } from "@dashboard/customers/types";
 import { CountryWithCodeFragment, WarehouseErrorFragment } from "@dashboard/graphql";
 import useAddressValidation from "@dashboard/hooks/useAddressValidation";
@@ -74,14 +74,14 @@ const ShippingZoneAddWarehouseDialog: React.FC<ShippingZoneAddWarehouseDialogPro
           );
 
           return (
-            <DashboardModal.Content __maxWidth={DASHBOARD_MODAL_WIDTH} width="100%">
-              <DashboardModal.Title>
+            <DashboardModal.Content size="sm">
+              <DashboardModal.Header>
                 <FormattedMessage
                   id="yzYXW/"
                   defaultMessage="Create New Warehouse"
                   description="header, dialog"
                 />
-              </DashboardModal.Title>
+              </DashboardModal.Header>
 
               <TextField
                 fullWidth

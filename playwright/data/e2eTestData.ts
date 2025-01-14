@@ -404,11 +404,44 @@ export const PRODUCTS = {
       "a product to be deleted via bulk 3/3",
     ],
   },
+  productWithPriceHigherThan20: {
+    id: "HJvZHVjdDo2NA==",
+    name: "Ocean Poems",
+    variantSKU: "ocean-poems-mp3",
+    price: 22,
+  },
+  productWithPriceLowerThan20: {
+    name: "Bean Juice",
+    variantSKU: "57423879",
+    price: 3,
+  },
+  giftProduct: {
+    name: "Power Juice",
+  },
+  productWithDiscountChannelPLN: {
+    id: "UHJvZHVjdDo3NzA=",
+    name: "e2e-do-not-touch",
+    rewardPercentageDiscountValue: 40,
+    variant: {
+      id: "UHJvZHVjdFZhcmlhbnQ6MTIzOQ==",
+      sku: "TEST-123",
+      undiscountedPrice: 100,
+      discountedPrice: 60,
+    },
+  },
 };
 
 export const ORDERS = {
   draftOrdersToBeDeleted: {
     ids: ["#3266", "#3265"],
+  },
+  draftOrderChannelPLN: {
+    id: "T3JkZXI6Zjg0NTk3N2EtM2Y3Yy00NDY3LWI3N2MtZDY0ZjhhMDU2MmQy",
+    productInBasket: {
+      productName: "Black Hoodie",
+      price: 20,
+      variantId: "UHJvZHVjdFZhcmlhbnQ6Mjk3",
+    },
   },
   ordersWithinTransactionFlow: {
     markAsPaidOrder: {
@@ -482,12 +515,16 @@ export const ORDERS = {
       },
     ],
   },
+  orderWithoutAddedCustomer: {
+    id: "T3JkZXI6MDM4MjM4NDMtYjg3My00ZTQ2LWE1NTItNjc0ZGIwZjE2ZGZh",
+  },
 };
 
 export const SHIPPING_METHODS = {
   shippingMethodWithoutRates: {
     id: "U2hpcHBpbmdab25lOjIzOTA%3D",
     info: "Shipping method that is used to add rates",
+    name: "Shipping method that is used to add rates",
   },
   shippingMethodToBeUpdated: {
     id: "U2hpcHBpbmdab25lOjIzOTI=",

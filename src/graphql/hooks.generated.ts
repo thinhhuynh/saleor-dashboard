@@ -117,6 +117,15 @@ export const AppListItemFragmentDoc = gql`
   }
 }
     ${AppPermissionFragmentDoc}`;
+export const EventDeliveryAttemptFragmentDoc = gql`
+    fragment EventDeliveryAttempt on EventDeliveryAttempt {
+  id
+  createdAt
+  status
+  response
+  responseStatusCode
+}
+    `;
 export const AttributeFragmentDoc = gql`
     fragment Attribute on Attribute {
   id
@@ -203,6 +212,7 @@ export const UserFragmentDoc = gql`
   firstName
   lastName
   isStaff
+  dateJoined
   metadata {
     key
     value
@@ -276,6 +286,33 @@ export const ChannelErrorFragmentDoc = gql`
   message
 }
     `;
+export const WarehouseFragmentDoc = gql`
+    fragment Warehouse on Warehouse {
+  id
+  name
+}
+    `;
+export const ChannelDetailsFragmentDoc = gql`
+    fragment ChannelDetails on Channel {
+  ...Channel
+  hasOrders
+  warehouses {
+    ...Warehouse
+  }
+  orderSettings {
+    markAsPaidStrategy
+    deleteExpiredOrdersAfter
+    allowUnpaidOrders
+  }
+  paymentSettings {
+    defaultTransactionFlowStrategy
+  }
+  checkoutSettings {
+    automaticallyCompleteFullyPaidCheckouts
+  }
+}
+    ${ChannelFragmentDoc}
+${WarehouseFragmentDoc}`;
 export const CollectionFragmentDoc = gql`
     fragment Collection on Collection {
   id
@@ -367,7 +404,6 @@ export const AddressFragmentDoc = gql`
 export const CustomerDetailsFragmentDoc = gql`
     fragment CustomerDetails on User {
   ...Customer
-  ...Metadata
   dateJoined
   lastLogin
   defaultShippingAddress {
@@ -380,7 +416,6 @@ export const CustomerDetailsFragmentDoc = gql`
   isActive
 }
     ${CustomerFragmentDoc}
-${MetadataFragmentDoc}
 ${AddressFragmentDoc}`;
 export const CustomerAddressesFragmentDoc = gql`
     fragment CustomerAddresses on User {
@@ -627,37 +662,26 @@ export const VoucherDetailsFragmentDoc = gql`
     ${VoucherFragmentDoc}
 ${ChannelListingProductWithoutPricingFragmentDoc}
 ${PageInfoFragmentDoc}`;
-export const WarehouseFragmentDoc = gql`
-    fragment Warehouse on Warehouse {
+export const PromotionRuleChannelFragmentDoc = gql`
+    fragment PromotionRuleChannel on Channel {
   id
+  isActive
   name
+  slug
+  currencyCode
+  defaultCountry {
+    code
+    country
+  }
 }
     `;
-export const ChannelDetailsFragmentDoc = gql`
-    fragment ChannelDetails on Channel {
-  ...Channel
-  hasOrders
-  warehouses {
-    ...Warehouse
-  }
-  orderSettings {
-    markAsPaidStrategy
-    deleteExpiredOrdersAfter
-    allowUnpaidOrders
-  }
-  paymentSettings {
-    defaultTransactionFlowStrategy
-  }
-}
-    ${ChannelFragmentDoc}
-${WarehouseFragmentDoc}`;
 export const PromotionRuleDetailsFragmentDoc = gql`
     fragment PromotionRuleDetails on PromotionRule {
   id
   name
   description
   channels {
-    ...ChannelDetails
+    ...PromotionRuleChannel
   }
   giftIds
   rewardType
@@ -666,7 +690,7 @@ export const PromotionRuleDetailsFragmentDoc = gql`
   cataloguePredicate
   orderPredicate
 }
-    ${ChannelDetailsFragmentDoc}`;
+    ${PromotionRuleChannelFragmentDoc}`;
 export const PromotionDetailsFragmentDoc = gql`
     fragment PromotionDetails on Promotion {
   id
@@ -1273,13 +1297,6 @@ export const GiftCardsSettingsFragmentDoc = gql`
   }
 }
     `;
-export const UserBaseFragmentDoc = gql`
-    fragment UserBase on User {
-  id
-  firstName
-  lastName
-}
-    `;
 export const MoneyFragmentDoc = gql`
     fragment Money on Money {
   amount
@@ -1293,22 +1310,6 @@ export const GiftCardEventFragmentDoc = gql`
   id
   date
   type
-  user {
-    ...UserBase
-    email
-    avatar(size: 128) {
-      url
-    }
-  }
-  app {
-    id
-    name
-    brand {
-      logo {
-        default(size: 128)
-      }
-    }
-  }
   message
   email
   orderId
@@ -1330,8 +1331,14 @@ export const GiftCardEventFragmentDoc = gql`
     }
   }
 }
-    ${UserBaseFragmentDoc}
-${MoneyFragmentDoc}`;
+    ${MoneyFragmentDoc}`;
+export const UserBaseFragmentDoc = gql`
+    fragment UserBase on User {
+  id
+  firstName
+  lastName
+}
+    `;
 export const GiftCardDataFragmentDoc = gql`
     fragment GiftCardData on GiftCard {
   ...Metadata
@@ -1352,10 +1359,6 @@ export const GiftCardDataFragmentDoc = gql`
   }
   usedByEmail
   createdByEmail
-  app {
-    id
-    name
-  }
   created
   expiryDate
   lastUsedOn
@@ -2046,7 +2049,7 @@ export const OrderLineWithMetadataFragmentDoc = gql`
     metadata {
       ...MetadataItem
     }
-    privateMetadata @include(if: $isStaffUser) {
+    privateMetadata @include(if: $hasManageProducts) {
       ...MetadataItem
     }
   }
@@ -2233,6 +2236,18 @@ ${OrderFulfillmentGrantRefundFragmentDoc}
 ${MoneyFragmentDoc}
 ${OrderDetailsGrantedRefundFragmentDoc}
 ${TransactionItemFragmentDoc}`;
+export const ActivitiesFragmentDoc = gql`
+    fragment Activities on OrderEvent {
+  date
+  email
+  message
+  orderNumber
+  type
+  user {
+    email
+  }
+}
+    `;
 export const PageTypeFragmentDoc = gql`
     fragment PageType on PageType {
   id
@@ -2474,6 +2489,7 @@ export const ProductTypeFragmentDoc = gql`
     fragment ProductType on ProductType {
   id
   name
+  slug
   kind
   hasVariants
   isShippingRequired
@@ -4133,14 +4149,14 @@ export const AppWebhookDeliveriesDocument = gql`
       eventDeliveries(first: 10) {
         edges {
           node {
+            id
             createdAt
             status
             eventType
             attempts(first: 10) {
               edges {
                 node {
-                  createdAt
-                  status
+                  ...EventDeliveryAttempt
                 }
               }
             }
@@ -4150,7 +4166,7 @@ export const AppWebhookDeliveriesDocument = gql`
     }
   }
 }
-    `;
+    ${EventDeliveryAttemptFragmentDoc}`;
 
 /**
  * __useAppWebhookDeliveriesQuery__
@@ -6419,42 +6435,48 @@ export function useChannelListLazyQuery(baseOptions?: ApolloReactHooks.LazyQuery
 export type ChannelListQueryHookResult = ReturnType<typeof useChannelListQuery>;
 export type ChannelListLazyQueryHookResult = ReturnType<typeof useChannelListLazyQuery>;
 export type ChannelListQueryResult = Apollo.QueryResult<Types.ChannelListQuery, Types.ChannelListQueryVariables>;
-export const CheckIfOrderExistsDocument = gql`
-    query CheckIfOrderExists($id: ID!) {
-  order(id: $id) {
-    id
-    status
+export const SearchOrdersByNumberDocument = gql`
+    query SearchOrdersByNumber($first: Int!, $query: [String!]) {
+  orders(first: $first, filter: {numbers: $query}) {
+    edges {
+      node {
+        id
+        number
+        status
+      }
+    }
   }
 }
     `;
 
 /**
- * __useCheckIfOrderExistsQuery__
+ * __useSearchOrdersByNumberQuery__
  *
- * To run a query within a React component, call `useCheckIfOrderExistsQuery` and pass it any options that fit your needs.
- * When your component renders, `useCheckIfOrderExistsQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * To run a query within a React component, call `useSearchOrdersByNumberQuery` and pass it any options that fit your needs.
+ * When your component renders, `useSearchOrdersByNumberQuery` returns an object from Apollo Client that contains loading, error, and data properties
  * you can use to render your UI.
  *
  * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
  *
  * @example
- * const { data, loading, error } = useCheckIfOrderExistsQuery({
+ * const { data, loading, error } = useSearchOrdersByNumberQuery({
  *   variables: {
- *      id: // value for 'id'
+ *      first: // value for 'first'
+ *      query: // value for 'query'
  *   },
  * });
  */
-export function useCheckIfOrderExistsQuery(baseOptions: ApolloReactHooks.QueryHookOptions<Types.CheckIfOrderExistsQuery, Types.CheckIfOrderExistsQueryVariables>) {
+export function useSearchOrdersByNumberQuery(baseOptions: ApolloReactHooks.QueryHookOptions<Types.SearchOrdersByNumberQuery, Types.SearchOrdersByNumberQueryVariables>) {
         const options = {...defaultOptions, ...baseOptions}
-        return ApolloReactHooks.useQuery<Types.CheckIfOrderExistsQuery, Types.CheckIfOrderExistsQueryVariables>(CheckIfOrderExistsDocument, options);
+        return ApolloReactHooks.useQuery<Types.SearchOrdersByNumberQuery, Types.SearchOrdersByNumberQueryVariables>(SearchOrdersByNumberDocument, options);
       }
-export function useCheckIfOrderExistsLazyQuery(baseOptions?: ApolloReactHooks.LazyQueryHookOptions<Types.CheckIfOrderExistsQuery, Types.CheckIfOrderExistsQueryVariables>) {
+export function useSearchOrdersByNumberLazyQuery(baseOptions?: ApolloReactHooks.LazyQueryHookOptions<Types.SearchOrdersByNumberQuery, Types.SearchOrdersByNumberQueryVariables>) {
           const options = {...defaultOptions, ...baseOptions}
-          return ApolloReactHooks.useLazyQuery<Types.CheckIfOrderExistsQuery, Types.CheckIfOrderExistsQueryVariables>(CheckIfOrderExistsDocument, options);
+          return ApolloReactHooks.useLazyQuery<Types.SearchOrdersByNumberQuery, Types.SearchOrdersByNumberQueryVariables>(SearchOrdersByNumberDocument, options);
         }
-export type CheckIfOrderExistsQueryHookResult = ReturnType<typeof useCheckIfOrderExistsQuery>;
-export type CheckIfOrderExistsLazyQueryHookResult = ReturnType<typeof useCheckIfOrderExistsLazyQuery>;
-export type CheckIfOrderExistsQueryResult = Apollo.QueryResult<Types.CheckIfOrderExistsQuery, Types.CheckIfOrderExistsQueryVariables>;
+export type SearchOrdersByNumberQueryHookResult = ReturnType<typeof useSearchOrdersByNumberQuery>;
+export type SearchOrdersByNumberLazyQueryHookResult = ReturnType<typeof useSearchOrdersByNumberLazyQuery>;
+export type SearchOrdersByNumberQueryResult = Apollo.QueryResult<Types.SearchOrdersByNumberQuery, Types.SearchOrdersByNumberQueryVariables>;
 export const SearchCatalogDocument = gql`
     query SearchCatalog($first: Int!, $query: String!) {
   categories(first: $first, filter: {search: $query}) {
@@ -7244,9 +7266,15 @@ export type ListCustomersQueryHookResult = ReturnType<typeof useListCustomersQue
 export type ListCustomersLazyQueryHookResult = ReturnType<typeof useListCustomersLazyQuery>;
 export type ListCustomersQueryResult = Apollo.QueryResult<Types.ListCustomersQuery, Types.ListCustomersQueryVariables>;
 export const CustomerDetailsDocument = gql`
-    query CustomerDetails($id: ID!, $PERMISSION_MANAGE_ORDERS: Boolean!) {
+    query CustomerDetails($id: ID!, $PERMISSION_MANAGE_ORDERS: Boolean!, $PERMISSION_MANAGE_STAFF: Boolean!) {
   user(id: $id) {
     ...CustomerDetails
+    metadata {
+      ...MetadataItem
+    }
+    privateMetadata @include(if: $PERMISSION_MANAGE_STAFF) {
+      ...MetadataItem
+    }
     orders(last: 5) @include(if: $PERMISSION_MANAGE_ORDERS) {
       edges {
         node {
@@ -7273,7 +7301,8 @@ export const CustomerDetailsDocument = gql`
     }
   }
 }
-    ${CustomerDetailsFragmentDoc}`;
+    ${CustomerDetailsFragmentDoc}
+${MetadataItemFragmentDoc}`;
 
 /**
  * __useCustomerDetailsQuery__
@@ -7289,6 +7318,7 @@ export const CustomerDetailsDocument = gql`
  *   variables: {
  *      id: // value for 'id'
  *      PERMISSION_MANAGE_ORDERS: // value for 'PERMISSION_MANAGE_ORDERS'
+ *      PERMISSION_MANAGE_STAFF: // value for 'PERMISSION_MANAGE_STAFF'
  *   },
  * });
  */
@@ -8648,27 +8678,7 @@ export const PromotionDetailsQueryDocument = gql`
       name
       description
       channels {
-        id
-        isActive
-        name
-        slug
-        currencyCode
-        defaultCountry {
-          code
-          country
-        }
-        stockSettings {
-          allocationStrategy
-        }
-        hasOrders
-        orderSettings {
-          markAsPaidStrategy
-          deleteExpiredOrdersAfter
-          allowUnpaidOrders
-        }
-        paymentSettings {
-          defaultTransactionFlowStrategy
-        }
+        ...PromotionRuleChannel
       }
       giftIds
       rewardType
@@ -8679,7 +8689,7 @@ export const PromotionDetailsQueryDocument = gql`
     }
   }
 }
-    `;
+    ${PromotionRuleChannelFragmentDoc}`;
 
 /**
  * __usePromotionDetailsQueryQuery__
@@ -8968,6 +8978,62 @@ export function useGiftCardSettingsLazyQuery(baseOptions?: ApolloReactHooks.Lazy
 export type GiftCardSettingsQueryHookResult = ReturnType<typeof useGiftCardSettingsQuery>;
 export type GiftCardSettingsLazyQueryHookResult = ReturnType<typeof useGiftCardSettingsLazyQuery>;
 export type GiftCardSettingsQueryResult = Apollo.QueryResult<Types.GiftCardSettingsQuery, Types.GiftCardSettingsQueryVariables>;
+export const GiftCardEventsDocument = gql`
+    query GiftCardEvents($id: ID!, $canSeeApp: Boolean!, $canSeeUser: Boolean!) {
+  giftCard(id: $id) {
+    events {
+      ...GiftCardEvent
+      app @include(if: $canSeeApp) {
+        id
+        name
+        brand {
+          logo {
+            default(size: 128)
+          }
+        }
+      }
+      user @include(if: $canSeeUser) {
+        ...UserBase
+        email
+        avatar(size: 128) {
+          url
+        }
+      }
+    }
+  }
+}
+    ${GiftCardEventFragmentDoc}
+${UserBaseFragmentDoc}`;
+
+/**
+ * __useGiftCardEventsQuery__
+ *
+ * To run a query within a React component, call `useGiftCardEventsQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGiftCardEventsQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGiftCardEventsQuery({
+ *   variables: {
+ *      id: // value for 'id'
+ *      canSeeApp: // value for 'canSeeApp'
+ *      canSeeUser: // value for 'canSeeUser'
+ *   },
+ * });
+ */
+export function useGiftCardEventsQuery(baseOptions: ApolloReactHooks.QueryHookOptions<Types.GiftCardEventsQuery, Types.GiftCardEventsQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return ApolloReactHooks.useQuery<Types.GiftCardEventsQuery, Types.GiftCardEventsQueryVariables>(GiftCardEventsDocument, options);
+      }
+export function useGiftCardEventsLazyQuery(baseOptions?: ApolloReactHooks.LazyQueryHookOptions<Types.GiftCardEventsQuery, Types.GiftCardEventsQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return ApolloReactHooks.useLazyQuery<Types.GiftCardEventsQuery, Types.GiftCardEventsQueryVariables>(GiftCardEventsDocument, options);
+        }
+export type GiftCardEventsQueryHookResult = ReturnType<typeof useGiftCardEventsQuery>;
+export type GiftCardEventsLazyQueryHookResult = ReturnType<typeof useGiftCardEventsLazyQuery>;
+export type GiftCardEventsQueryResult = Apollo.QueryResult<Types.GiftCardEventsQuery, Types.GiftCardEventsQueryVariables>;
 export const GiftCardResendDocument = gql`
     mutation GiftCardResend($input: GiftCardResendInput!) {
   giftCardResend(input: $input) {
@@ -9086,13 +9152,16 @@ export type GiftCardDeactivateMutationHookResult = ReturnType<typeof useGiftCard
 export type GiftCardDeactivateMutationResult = Apollo.MutationResult<Types.GiftCardDeactivateMutation>;
 export type GiftCardDeactivateMutationOptions = Apollo.BaseMutationOptions<Types.GiftCardDeactivateMutation, Types.GiftCardDeactivateMutationVariables>;
 export const GiftCardUpdateDocument = gql`
-    mutation GiftCardUpdate($id: ID!, $input: GiftCardUpdateInput!) {
+    mutation GiftCardUpdate($id: ID!, $input: GiftCardUpdateInput!, $showCreatedBy: Boolean!) {
   giftCardUpdate(id: $id, input: $input) {
     errors {
       ...GiftCardError
     }
     giftCard {
       ...GiftCardData
+      createdBy @include(if: $showCreatedBy) {
+        ...UserBase
+      }
       events {
         ...GiftCardEvent
       }
@@ -9101,6 +9170,7 @@ export const GiftCardUpdateDocument = gql`
 }
     ${GiftCardErrorFragmentDoc}
 ${GiftCardDataFragmentDoc}
+${UserBaseFragmentDoc}
 ${GiftCardEventFragmentDoc}`;
 export type GiftCardUpdateMutationFn = Apollo.MutationFunction<Types.GiftCardUpdateMutation, Types.GiftCardUpdateMutationVariables>;
 
@@ -9119,6 +9189,7 @@ export type GiftCardUpdateMutationFn = Apollo.MutationFunction<Types.GiftCardUpd
  *   variables: {
  *      id: // value for 'id'
  *      input: // value for 'input'
+ *      showCreatedBy: // value for 'showCreatedBy'
  *   },
  * });
  */
@@ -9249,13 +9320,9 @@ export const GiftCardDetailsDocument = gql`
     query GiftCardDetails($id: ID!) {
   giftCard(id: $id) {
     ...GiftCardData
-    events {
-      ...GiftCardEvent
-    }
   }
 }
-    ${GiftCardDataFragmentDoc}
-${GiftCardEventFragmentDoc}`;
+    ${GiftCardDataFragmentDoc}`;
 
 /**
  * __useGiftCardDetailsQuery__
@@ -9574,196 +9641,6 @@ export function useCustomerGiftCardListLazyQuery(baseOptions?: ApolloReactHooks.
 export type CustomerGiftCardListQueryHookResult = ReturnType<typeof useCustomerGiftCardListQuery>;
 export type CustomerGiftCardListLazyQueryHookResult = ReturnType<typeof useCustomerGiftCardListLazyQuery>;
 export type CustomerGiftCardListQueryResult = Apollo.QueryResult<Types.CustomerGiftCardListQuery, Types.CustomerGiftCardListQueryVariables>;
-export const HomeAnaliticsDocument = gql`
-    query HomeAnalitics($channel: String!, $hasPermissionToManageOrders: Boolean!) {
-  salesToday: ordersTotal(period: TODAY, channel: $channel) @include(if: $hasPermissionToManageOrders) {
-    gross {
-      amount
-      currency
-    }
-  }
-}
-    `;
-
-/**
- * __useHomeAnaliticsQuery__
- *
- * To run a query within a React component, call `useHomeAnaliticsQuery` and pass it any options that fit your needs.
- * When your component renders, `useHomeAnaliticsQuery` returns an object from Apollo Client that contains loading, error, and data properties
- * you can use to render your UI.
- *
- * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
- *
- * @example
- * const { data, loading, error } = useHomeAnaliticsQuery({
- *   variables: {
- *      channel: // value for 'channel'
- *      hasPermissionToManageOrders: // value for 'hasPermissionToManageOrders'
- *   },
- * });
- */
-export function useHomeAnaliticsQuery(baseOptions: ApolloReactHooks.QueryHookOptions<Types.HomeAnaliticsQuery, Types.HomeAnaliticsQueryVariables>) {
-        const options = {...defaultOptions, ...baseOptions}
-        return ApolloReactHooks.useQuery<Types.HomeAnaliticsQuery, Types.HomeAnaliticsQueryVariables>(HomeAnaliticsDocument, options);
-      }
-export function useHomeAnaliticsLazyQuery(baseOptions?: ApolloReactHooks.LazyQueryHookOptions<Types.HomeAnaliticsQuery, Types.HomeAnaliticsQueryVariables>) {
-          const options = {...defaultOptions, ...baseOptions}
-          return ApolloReactHooks.useLazyQuery<Types.HomeAnaliticsQuery, Types.HomeAnaliticsQueryVariables>(HomeAnaliticsDocument, options);
-        }
-export type HomeAnaliticsQueryHookResult = ReturnType<typeof useHomeAnaliticsQuery>;
-export type HomeAnaliticsLazyQueryHookResult = ReturnType<typeof useHomeAnaliticsLazyQuery>;
-export type HomeAnaliticsQueryResult = Apollo.QueryResult<Types.HomeAnaliticsQuery, Types.HomeAnaliticsQueryVariables>;
-export const HomeActivitiesDocument = gql`
-    query HomeActivities($hasPermissionToManageOrders: Boolean!) {
-  activities: homepageEvents(last: 10) @include(if: $hasPermissionToManageOrders) {
-    edges {
-      node {
-        amount
-        composedId
-        date
-        email
-        emailType
-        id
-        message
-        orderNumber
-        oversoldItems
-        quantity
-        type
-        user {
-          id
-          email
-        }
-      }
-    }
-  }
-}
-    `;
-
-/**
- * __useHomeActivitiesQuery__
- *
- * To run a query within a React component, call `useHomeActivitiesQuery` and pass it any options that fit your needs.
- * When your component renders, `useHomeActivitiesQuery` returns an object from Apollo Client that contains loading, error, and data properties
- * you can use to render your UI.
- *
- * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
- *
- * @example
- * const { data, loading, error } = useHomeActivitiesQuery({
- *   variables: {
- *      hasPermissionToManageOrders: // value for 'hasPermissionToManageOrders'
- *   },
- * });
- */
-export function useHomeActivitiesQuery(baseOptions: ApolloReactHooks.QueryHookOptions<Types.HomeActivitiesQuery, Types.HomeActivitiesQueryVariables>) {
-        const options = {...defaultOptions, ...baseOptions}
-        return ApolloReactHooks.useQuery<Types.HomeActivitiesQuery, Types.HomeActivitiesQueryVariables>(HomeActivitiesDocument, options);
-      }
-export function useHomeActivitiesLazyQuery(baseOptions?: ApolloReactHooks.LazyQueryHookOptions<Types.HomeActivitiesQuery, Types.HomeActivitiesQueryVariables>) {
-          const options = {...defaultOptions, ...baseOptions}
-          return ApolloReactHooks.useLazyQuery<Types.HomeActivitiesQuery, Types.HomeActivitiesQueryVariables>(HomeActivitiesDocument, options);
-        }
-export type HomeActivitiesQueryHookResult = ReturnType<typeof useHomeActivitiesQuery>;
-export type HomeActivitiesLazyQueryHookResult = ReturnType<typeof useHomeActivitiesLazyQuery>;
-export type HomeActivitiesQueryResult = Apollo.QueryResult<Types.HomeActivitiesQuery, Types.HomeActivitiesQueryVariables>;
-export const HomeTopProductsDocument = gql`
-    query HomeTopProducts($channel: String!, $hasPermissionToManageProducts: Boolean!) {
-  productTopToday: reportProductSales(period: TODAY, first: 5, channel: $channel) @include(if: $hasPermissionToManageProducts) {
-    edges {
-      node {
-        id
-        revenue(period: TODAY) {
-          gross {
-            amount
-            currency
-          }
-        }
-        attributes {
-          values {
-            id
-            name
-          }
-        }
-        product {
-          id
-          name
-          thumbnail {
-            url
-          }
-        }
-        quantityOrdered
-      }
-    }
-  }
-}
-    `;
-
-/**
- * __useHomeTopProductsQuery__
- *
- * To run a query within a React component, call `useHomeTopProductsQuery` and pass it any options that fit your needs.
- * When your component renders, `useHomeTopProductsQuery` returns an object from Apollo Client that contains loading, error, and data properties
- * you can use to render your UI.
- *
- * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
- *
- * @example
- * const { data, loading, error } = useHomeTopProductsQuery({
- *   variables: {
- *      channel: // value for 'channel'
- *      hasPermissionToManageProducts: // value for 'hasPermissionToManageProducts'
- *   },
- * });
- */
-export function useHomeTopProductsQuery(baseOptions: ApolloReactHooks.QueryHookOptions<Types.HomeTopProductsQuery, Types.HomeTopProductsQueryVariables>) {
-        const options = {...defaultOptions, ...baseOptions}
-        return ApolloReactHooks.useQuery<Types.HomeTopProductsQuery, Types.HomeTopProductsQueryVariables>(HomeTopProductsDocument, options);
-      }
-export function useHomeTopProductsLazyQuery(baseOptions?: ApolloReactHooks.LazyQueryHookOptions<Types.HomeTopProductsQuery, Types.HomeTopProductsQueryVariables>) {
-          const options = {...defaultOptions, ...baseOptions}
-          return ApolloReactHooks.useLazyQuery<Types.HomeTopProductsQuery, Types.HomeTopProductsQueryVariables>(HomeTopProductsDocument, options);
-        }
-export type HomeTopProductsQueryHookResult = ReturnType<typeof useHomeTopProductsQuery>;
-export type HomeTopProductsLazyQueryHookResult = ReturnType<typeof useHomeTopProductsLazyQuery>;
-export type HomeTopProductsQueryResult = Apollo.QueryResult<Types.HomeTopProductsQuery, Types.HomeTopProductsQueryVariables>;
-export const HomeNotificationsDocument = gql`
-    query homeNotifications($channel: String!) {
-  productsOutOfStock: products(
-    filter: {stockAvailability: OUT_OF_STOCK}
-    channel: $channel
-  ) {
-    totalCount
-  }
-}
-    `;
-
-/**
- * __useHomeNotificationsQuery__
- *
- * To run a query within a React component, call `useHomeNotificationsQuery` and pass it any options that fit your needs.
- * When your component renders, `useHomeNotificationsQuery` returns an object from Apollo Client that contains loading, error, and data properties
- * you can use to render your UI.
- *
- * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
- *
- * @example
- * const { data, loading, error } = useHomeNotificationsQuery({
- *   variables: {
- *      channel: // value for 'channel'
- *   },
- * });
- */
-export function useHomeNotificationsQuery(baseOptions: ApolloReactHooks.QueryHookOptions<Types.HomeNotificationsQuery, Types.HomeNotificationsQueryVariables>) {
-        const options = {...defaultOptions, ...baseOptions}
-        return ApolloReactHooks.useQuery<Types.HomeNotificationsQuery, Types.HomeNotificationsQueryVariables>(HomeNotificationsDocument, options);
-      }
-export function useHomeNotificationsLazyQuery(baseOptions?: ApolloReactHooks.LazyQueryHookOptions<Types.HomeNotificationsQuery, Types.HomeNotificationsQueryVariables>) {
-          const options = {...defaultOptions, ...baseOptions}
-          return ApolloReactHooks.useLazyQuery<Types.HomeNotificationsQuery, Types.HomeNotificationsQueryVariables>(HomeNotificationsDocument, options);
-        }
-export type HomeNotificationsQueryHookResult = ReturnType<typeof useHomeNotificationsQuery>;
-export type HomeNotificationsLazyQueryHookResult = ReturnType<typeof useHomeNotificationsLazyQuery>;
-export type HomeNotificationsQueryResult = Apollo.QueryResult<Types.HomeNotificationsQuery, Types.HomeNotificationsQueryVariables>;
 export const MenuCreateDocument = gql`
     mutation MenuCreate($input: MenuCreateInput!) {
   menuCreate(input: $input) {
@@ -11939,7 +11816,7 @@ export type OrderDetailsQueryHookResult = ReturnType<typeof useOrderDetailsQuery
 export type OrderDetailsLazyQueryHookResult = ReturnType<typeof useOrderDetailsLazyQuery>;
 export type OrderDetailsQueryResult = Apollo.QueryResult<Types.OrderDetailsQuery, Types.OrderDetailsQueryVariables>;
 export const OrderDetailsWithMetadataDocument = gql`
-    query OrderDetailsWithMetadata($id: ID!, $isStaffUser: Boolean!) {
+    query OrderDetailsWithMetadata($id: ID!, $hasManageProducts: Boolean!) {
   order(id: $id) {
     ...OrderDetailsWithMetadata
   }
@@ -11972,7 +11849,7 @@ ${PaymentGatewayFragmentDoc}`;
  * const { data, loading, error } = useOrderDetailsWithMetadataQuery({
  *   variables: {
  *      id: // value for 'id'
- *      isStaffUser: // value for 'isStaffUser'
+ *      hasManageProducts: // value for 'hasManageProducts'
  *   },
  * });
  */
@@ -14933,167 +14810,6 @@ export function useProductVariantBulkUpdateMutation(baseOptions?: ApolloReactHoo
 export type ProductVariantBulkUpdateMutationHookResult = ReturnType<typeof useProductVariantBulkUpdateMutation>;
 export type ProductVariantBulkUpdateMutationResult = Apollo.MutationResult<Types.ProductVariantBulkUpdateMutation>;
 export type ProductVariantBulkUpdateMutationOptions = Apollo.BaseMutationOptions<Types.ProductVariantBulkUpdateMutation, Types.ProductVariantBulkUpdateMutationVariables>;
-export const InitialProductFilterAttributesDocument = gql`
-    query InitialProductFilterAttributes {
-  attributes(first: 100, filter: {type: PRODUCT_TYPE}) {
-    edges {
-      node {
-        id
-        name
-        inputType
-        slug
-      }
-    }
-  }
-}
-    `;
-
-/**
- * __useInitialProductFilterAttributesQuery__
- *
- * To run a query within a React component, call `useInitialProductFilterAttributesQuery` and pass it any options that fit your needs.
- * When your component renders, `useInitialProductFilterAttributesQuery` returns an object from Apollo Client that contains loading, error, and data properties
- * you can use to render your UI.
- *
- * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
- *
- * @example
- * const { data, loading, error } = useInitialProductFilterAttributesQuery({
- *   variables: {
- *   },
- * });
- */
-export function useInitialProductFilterAttributesQuery(baseOptions?: ApolloReactHooks.QueryHookOptions<Types.InitialProductFilterAttributesQuery, Types.InitialProductFilterAttributesQueryVariables>) {
-        const options = {...defaultOptions, ...baseOptions}
-        return ApolloReactHooks.useQuery<Types.InitialProductFilterAttributesQuery, Types.InitialProductFilterAttributesQueryVariables>(InitialProductFilterAttributesDocument, options);
-      }
-export function useInitialProductFilterAttributesLazyQuery(baseOptions?: ApolloReactHooks.LazyQueryHookOptions<Types.InitialProductFilterAttributesQuery, Types.InitialProductFilterAttributesQueryVariables>) {
-          const options = {...defaultOptions, ...baseOptions}
-          return ApolloReactHooks.useLazyQuery<Types.InitialProductFilterAttributesQuery, Types.InitialProductFilterAttributesQueryVariables>(InitialProductFilterAttributesDocument, options);
-        }
-export type InitialProductFilterAttributesQueryHookResult = ReturnType<typeof useInitialProductFilterAttributesQuery>;
-export type InitialProductFilterAttributesLazyQueryHookResult = ReturnType<typeof useInitialProductFilterAttributesLazyQuery>;
-export type InitialProductFilterAttributesQueryResult = Apollo.QueryResult<Types.InitialProductFilterAttributesQuery, Types.InitialProductFilterAttributesQueryVariables>;
-export const InitialProductFilterCategoriesDocument = gql`
-    query InitialProductFilterCategories($categories: [ID!]) {
-  categories(first: 100, filter: {ids: $categories}) {
-    edges {
-      node {
-        id
-        name
-      }
-    }
-  }
-}
-    `;
-
-/**
- * __useInitialProductFilterCategoriesQuery__
- *
- * To run a query within a React component, call `useInitialProductFilterCategoriesQuery` and pass it any options that fit your needs.
- * When your component renders, `useInitialProductFilterCategoriesQuery` returns an object from Apollo Client that contains loading, error, and data properties
- * you can use to render your UI.
- *
- * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
- *
- * @example
- * const { data, loading, error } = useInitialProductFilterCategoriesQuery({
- *   variables: {
- *      categories: // value for 'categories'
- *   },
- * });
- */
-export function useInitialProductFilterCategoriesQuery(baseOptions?: ApolloReactHooks.QueryHookOptions<Types.InitialProductFilterCategoriesQuery, Types.InitialProductFilterCategoriesQueryVariables>) {
-        const options = {...defaultOptions, ...baseOptions}
-        return ApolloReactHooks.useQuery<Types.InitialProductFilterCategoriesQuery, Types.InitialProductFilterCategoriesQueryVariables>(InitialProductFilterCategoriesDocument, options);
-      }
-export function useInitialProductFilterCategoriesLazyQuery(baseOptions?: ApolloReactHooks.LazyQueryHookOptions<Types.InitialProductFilterCategoriesQuery, Types.InitialProductFilterCategoriesQueryVariables>) {
-          const options = {...defaultOptions, ...baseOptions}
-          return ApolloReactHooks.useLazyQuery<Types.InitialProductFilterCategoriesQuery, Types.InitialProductFilterCategoriesQueryVariables>(InitialProductFilterCategoriesDocument, options);
-        }
-export type InitialProductFilterCategoriesQueryHookResult = ReturnType<typeof useInitialProductFilterCategoriesQuery>;
-export type InitialProductFilterCategoriesLazyQueryHookResult = ReturnType<typeof useInitialProductFilterCategoriesLazyQuery>;
-export type InitialProductFilterCategoriesQueryResult = Apollo.QueryResult<Types.InitialProductFilterCategoriesQuery, Types.InitialProductFilterCategoriesQueryVariables>;
-export const InitialProductFilterCollectionsDocument = gql`
-    query InitialProductFilterCollections($collections: [ID!]) {
-  collections(first: 100, filter: {ids: $collections}) {
-    edges {
-      node {
-        id
-        name
-      }
-    }
-  }
-}
-    `;
-
-/**
- * __useInitialProductFilterCollectionsQuery__
- *
- * To run a query within a React component, call `useInitialProductFilterCollectionsQuery` and pass it any options that fit your needs.
- * When your component renders, `useInitialProductFilterCollectionsQuery` returns an object from Apollo Client that contains loading, error, and data properties
- * you can use to render your UI.
- *
- * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
- *
- * @example
- * const { data, loading, error } = useInitialProductFilterCollectionsQuery({
- *   variables: {
- *      collections: // value for 'collections'
- *   },
- * });
- */
-export function useInitialProductFilterCollectionsQuery(baseOptions?: ApolloReactHooks.QueryHookOptions<Types.InitialProductFilterCollectionsQuery, Types.InitialProductFilterCollectionsQueryVariables>) {
-        const options = {...defaultOptions, ...baseOptions}
-        return ApolloReactHooks.useQuery<Types.InitialProductFilterCollectionsQuery, Types.InitialProductFilterCollectionsQueryVariables>(InitialProductFilterCollectionsDocument, options);
-      }
-export function useInitialProductFilterCollectionsLazyQuery(baseOptions?: ApolloReactHooks.LazyQueryHookOptions<Types.InitialProductFilterCollectionsQuery, Types.InitialProductFilterCollectionsQueryVariables>) {
-          const options = {...defaultOptions, ...baseOptions}
-          return ApolloReactHooks.useLazyQuery<Types.InitialProductFilterCollectionsQuery, Types.InitialProductFilterCollectionsQueryVariables>(InitialProductFilterCollectionsDocument, options);
-        }
-export type InitialProductFilterCollectionsQueryHookResult = ReturnType<typeof useInitialProductFilterCollectionsQuery>;
-export type InitialProductFilterCollectionsLazyQueryHookResult = ReturnType<typeof useInitialProductFilterCollectionsLazyQuery>;
-export type InitialProductFilterCollectionsQueryResult = Apollo.QueryResult<Types.InitialProductFilterCollectionsQuery, Types.InitialProductFilterCollectionsQueryVariables>;
-export const InitialProductFilterProductTypesDocument = gql`
-    query InitialProductFilterProductTypes($productTypes: [ID!]) {
-  productTypes(first: 100, filter: {ids: $productTypes}) {
-    edges {
-      node {
-        id
-        name
-      }
-    }
-  }
-}
-    `;
-
-/**
- * __useInitialProductFilterProductTypesQuery__
- *
- * To run a query within a React component, call `useInitialProductFilterProductTypesQuery` and pass it any options that fit your needs.
- * When your component renders, `useInitialProductFilterProductTypesQuery` returns an object from Apollo Client that contains loading, error, and data properties
- * you can use to render your UI.
- *
- * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
- *
- * @example
- * const { data, loading, error } = useInitialProductFilterProductTypesQuery({
- *   variables: {
- *      productTypes: // value for 'productTypes'
- *   },
- * });
- */
-export function useInitialProductFilterProductTypesQuery(baseOptions?: ApolloReactHooks.QueryHookOptions<Types.InitialProductFilterProductTypesQuery, Types.InitialProductFilterProductTypesQueryVariables>) {
-        const options = {...defaultOptions, ...baseOptions}
-        return ApolloReactHooks.useQuery<Types.InitialProductFilterProductTypesQuery, Types.InitialProductFilterProductTypesQueryVariables>(InitialProductFilterProductTypesDocument, options);
-      }
-export function useInitialProductFilterProductTypesLazyQuery(baseOptions?: ApolloReactHooks.LazyQueryHookOptions<Types.InitialProductFilterProductTypesQuery, Types.InitialProductFilterProductTypesQueryVariables>) {
-          const options = {...defaultOptions, ...baseOptions}
-          return ApolloReactHooks.useLazyQuery<Types.InitialProductFilterProductTypesQuery, Types.InitialProductFilterProductTypesQueryVariables>(InitialProductFilterProductTypesDocument, options);
-        }
-export type InitialProductFilterProductTypesQueryHookResult = ReturnType<typeof useInitialProductFilterProductTypesQuery>;
-export type InitialProductFilterProductTypesLazyQueryHookResult = ReturnType<typeof useInitialProductFilterProductTypesLazyQuery>;
-export type InitialProductFilterProductTypesQueryResult = Apollo.QueryResult<Types.InitialProductFilterProductTypesQuery, Types.InitialProductFilterProductTypesQueryVariables>;
 export const ProductListDocument = gql`
     query ProductList($first: Int, $after: String, $last: Int, $before: String, $filter: ProductFilterInput, $search: String, $where: ProductWhereInput, $channel: String, $sort: ProductOrder, $hasChannel: Boolean!, $includeCategories: Boolean!, $includeCollections: Boolean!) {
   products(
@@ -20086,3 +19802,155 @@ export function useWarehousesCountLazyQuery(baseOptions?: ApolloReactHooks.LazyQ
 export type WarehousesCountQueryHookResult = ReturnType<typeof useWarehousesCountQuery>;
 export type WarehousesCountLazyQueryHookResult = ReturnType<typeof useWarehousesCountLazyQuery>;
 export type WarehousesCountQueryResult = Apollo.QueryResult<Types.WarehousesCountQuery, Types.WarehousesCountQueryVariables>;
+export const SaveOnBoardingStateDocument = gql`
+    mutation SaveOnBoardingState($id: ID!, $input: [MetadataInput!]!) {
+  updateMetadata(id: $id, input: $input) {
+    errors {
+      ...MetadataError
+    }
+  }
+}
+    ${MetadataErrorFragmentDoc}`;
+export type SaveOnBoardingStateMutationFn = Apollo.MutationFunction<Types.SaveOnBoardingStateMutation, Types.SaveOnBoardingStateMutationVariables>;
+
+/**
+ * __useSaveOnBoardingStateMutation__
+ *
+ * To run a mutation, you first call `useSaveOnBoardingStateMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useSaveOnBoardingStateMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [saveOnBoardingStateMutation, { data, loading, error }] = useSaveOnBoardingStateMutation({
+ *   variables: {
+ *      id: // value for 'id'
+ *      input: // value for 'input'
+ *   },
+ * });
+ */
+export function useSaveOnBoardingStateMutation(baseOptions?: ApolloReactHooks.MutationHookOptions<Types.SaveOnBoardingStateMutation, Types.SaveOnBoardingStateMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return ApolloReactHooks.useMutation<Types.SaveOnBoardingStateMutation, Types.SaveOnBoardingStateMutationVariables>(SaveOnBoardingStateDocument, options);
+      }
+export type SaveOnBoardingStateMutationHookResult = ReturnType<typeof useSaveOnBoardingStateMutation>;
+export type SaveOnBoardingStateMutationResult = Apollo.MutationResult<Types.SaveOnBoardingStateMutation>;
+export type SaveOnBoardingStateMutationOptions = Apollo.BaseMutationOptions<Types.SaveOnBoardingStateMutation, Types.SaveOnBoardingStateMutationVariables>;
+export const WelcomePageActivitiesDocument = gql`
+    query WelcomePageActivities($hasPermissionToManageOrders: Boolean!) {
+  activities: homepageEvents(last: 10) @include(if: $hasPermissionToManageOrders) {
+    edges {
+      node {
+        ...Activities
+      }
+    }
+  }
+}
+    ${ActivitiesFragmentDoc}`;
+
+/**
+ * __useWelcomePageActivitiesQuery__
+ *
+ * To run a query within a React component, call `useWelcomePageActivitiesQuery` and pass it any options that fit your needs.
+ * When your component renders, `useWelcomePageActivitiesQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useWelcomePageActivitiesQuery({
+ *   variables: {
+ *      hasPermissionToManageOrders: // value for 'hasPermissionToManageOrders'
+ *   },
+ * });
+ */
+export function useWelcomePageActivitiesQuery(baseOptions: ApolloReactHooks.QueryHookOptions<Types.WelcomePageActivitiesQuery, Types.WelcomePageActivitiesQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return ApolloReactHooks.useQuery<Types.WelcomePageActivitiesQuery, Types.WelcomePageActivitiesQueryVariables>(WelcomePageActivitiesDocument, options);
+      }
+export function useWelcomePageActivitiesLazyQuery(baseOptions?: ApolloReactHooks.LazyQueryHookOptions<Types.WelcomePageActivitiesQuery, Types.WelcomePageActivitiesQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return ApolloReactHooks.useLazyQuery<Types.WelcomePageActivitiesQuery, Types.WelcomePageActivitiesQueryVariables>(WelcomePageActivitiesDocument, options);
+        }
+export type WelcomePageActivitiesQueryHookResult = ReturnType<typeof useWelcomePageActivitiesQuery>;
+export type WelcomePageActivitiesLazyQueryHookResult = ReturnType<typeof useWelcomePageActivitiesLazyQuery>;
+export type WelcomePageActivitiesQueryResult = Apollo.QueryResult<Types.WelcomePageActivitiesQuery, Types.WelcomePageActivitiesQueryVariables>;
+export const WelcomePageAnalyticsDocument = gql`
+    query WelcomePageAnalytics($channel: String!, $hasPermissionToManageOrders: Boolean!) {
+  salesToday: ordersTotal(period: TODAY, channel: $channel) @include(if: $hasPermissionToManageOrders) {
+    gross {
+      amount
+      currency
+    }
+  }
+}
+    `;
+
+/**
+ * __useWelcomePageAnalyticsQuery__
+ *
+ * To run a query within a React component, call `useWelcomePageAnalyticsQuery` and pass it any options that fit your needs.
+ * When your component renders, `useWelcomePageAnalyticsQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useWelcomePageAnalyticsQuery({
+ *   variables: {
+ *      channel: // value for 'channel'
+ *      hasPermissionToManageOrders: // value for 'hasPermissionToManageOrders'
+ *   },
+ * });
+ */
+export function useWelcomePageAnalyticsQuery(baseOptions: ApolloReactHooks.QueryHookOptions<Types.WelcomePageAnalyticsQuery, Types.WelcomePageAnalyticsQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return ApolloReactHooks.useQuery<Types.WelcomePageAnalyticsQuery, Types.WelcomePageAnalyticsQueryVariables>(WelcomePageAnalyticsDocument, options);
+      }
+export function useWelcomePageAnalyticsLazyQuery(baseOptions?: ApolloReactHooks.LazyQueryHookOptions<Types.WelcomePageAnalyticsQuery, Types.WelcomePageAnalyticsQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return ApolloReactHooks.useLazyQuery<Types.WelcomePageAnalyticsQuery, Types.WelcomePageAnalyticsQueryVariables>(WelcomePageAnalyticsDocument, options);
+        }
+export type WelcomePageAnalyticsQueryHookResult = ReturnType<typeof useWelcomePageAnalyticsQuery>;
+export type WelcomePageAnalyticsLazyQueryHookResult = ReturnType<typeof useWelcomePageAnalyticsLazyQuery>;
+export type WelcomePageAnalyticsQueryResult = Apollo.QueryResult<Types.WelcomePageAnalyticsQuery, Types.WelcomePageAnalyticsQueryVariables>;
+export const WelcomePageNotificationsDocument = gql`
+    query welcomePageNotifications($channel: String!) {
+  productsOutOfStock: products(
+    filter: {stockAvailability: OUT_OF_STOCK}
+    channel: $channel
+  ) {
+    totalCount
+  }
+}
+    `;
+
+/**
+ * __useWelcomePageNotificationsQuery__
+ *
+ * To run a query within a React component, call `useWelcomePageNotificationsQuery` and pass it any options that fit your needs.
+ * When your component renders, `useWelcomePageNotificationsQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useWelcomePageNotificationsQuery({
+ *   variables: {
+ *      channel: // value for 'channel'
+ *   },
+ * });
+ */
+export function useWelcomePageNotificationsQuery(baseOptions: ApolloReactHooks.QueryHookOptions<Types.WelcomePageNotificationsQuery, Types.WelcomePageNotificationsQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return ApolloReactHooks.useQuery<Types.WelcomePageNotificationsQuery, Types.WelcomePageNotificationsQueryVariables>(WelcomePageNotificationsDocument, options);
+      }
+export function useWelcomePageNotificationsLazyQuery(baseOptions?: ApolloReactHooks.LazyQueryHookOptions<Types.WelcomePageNotificationsQuery, Types.WelcomePageNotificationsQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return ApolloReactHooks.useLazyQuery<Types.WelcomePageNotificationsQuery, Types.WelcomePageNotificationsQueryVariables>(WelcomePageNotificationsDocument, options);
+        }
+export type WelcomePageNotificationsQueryHookResult = ReturnType<typeof useWelcomePageNotificationsQuery>;
+export type WelcomePageNotificationsLazyQueryHookResult = ReturnType<typeof useWelcomePageNotificationsLazyQuery>;
+export type WelcomePageNotificationsQueryResult = Apollo.QueryResult<Types.WelcomePageNotificationsQuery, Types.WelcomePageNotificationsQueryVariables>;
