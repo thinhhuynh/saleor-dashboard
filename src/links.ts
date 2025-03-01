@@ -17,3 +17,6 @@ export const EXTENDING_WITH_WEBHOOKS_DOCS_URL =
   "https://docs.saleor.io/developer/extending/webhooks/overview";
 export const USER_PERMISSIONS_DOCS_URL =
   "https://docs.saleor.io/developer/permissions#user-permissions";
+export const ORDER_EVENTS_DOCS_URL =
+  "https://docs.saleor.io/developer/extending/api/events#order-events";
+export const GIFT_CARD_PRODUCT_DOCS_URL = "https://docs.saleor.io/developer/gift-cards";

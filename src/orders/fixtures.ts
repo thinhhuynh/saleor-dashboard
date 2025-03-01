@@ -997,6 +997,7 @@ export const order = (placeholder: string): OrderDetailsWithMetadataFragment => 
   events: [
     {
       __typename: "OrderEvent",
+      related: null,
       amount: null,
       date: "2018-09-17T13:22:24.376193+00:00",
       discount: null,
@@ -1029,6 +1030,7 @@ export const order = (placeholder: string): OrderDetailsWithMetadataFragment => 
     },
     {
       __typename: "OrderEvent",
+      related: null,
       amount: null,
       date: "2018-09-17T13:22:24.376193+00:00",
       discount: null,
@@ -1086,6 +1088,7 @@ export const order = (placeholder: string): OrderDetailsWithMetadataFragment => 
     },
     {
       __typename: "OrderEvent",
+      related: null,
       amount: null,
       date: "2019-09-17T13:22:24.376193+00:00",
       discount: null,
@@ -1105,6 +1108,7 @@ export const order = (placeholder: string): OrderDetailsWithMetadataFragment => 
     },
     {
       __typename: "OrderEvent",
+      related: null,
       amount: null,
       date: "2019-09-17T13:22:24.376193+00:00",
       discount: null,
@@ -1124,6 +1128,7 @@ export const order = (placeholder: string): OrderDetailsWithMetadataFragment => 
     },
     {
       __typename: "OrderEvent",
+      related: null,
       amount: null,
       date: "2019-09-17T13:22:24.376193+00:00",
       discount: null,
@@ -1143,6 +1148,7 @@ export const order = (placeholder: string): OrderDetailsWithMetadataFragment => 
     },
     {
       __typename: "OrderEvent",
+      related: null,
       amount: null,
       date: "2019-09-17T13:22:24.376193+00:00",
       discount: null,
@@ -1162,6 +1168,7 @@ export const order = (placeholder: string): OrderDetailsWithMetadataFragment => 
     },
     {
       __typename: "OrderEvent",
+      related: null,
       amount: null,
       date: "2019-09-17T13:22:24.376193+00:00",
       discount: null,
@@ -1181,6 +1188,7 @@ export const order = (placeholder: string): OrderDetailsWithMetadataFragment => 
     },
     {
       __typename: "OrderEvent",
+      related: null,
       amount: null,
       date: "2019-09-17T13:22:24.376193+00:00",
       discount: null,
@@ -1220,6 +1228,8 @@ export const order = (placeholder: string): OrderDetailsWithMetadataFragment => 
             quantityFulfilled: 2,
             quantityToFulfill: 0,
             isGift: false,
+            metadata: [],
+            privateMetadata: [],
             allocations: [
               {
                 id: "allocation_test_id",
@@ -1350,6 +1360,8 @@ export const order = (placeholder: string): OrderDetailsWithMetadataFragment => 
             quantityFulfilled: 2,
             quantityToFulfill: 0,
             isGift: false,
+            metadata: [],
+            privateMetadata: [],
             allocations: [
               {
                 id: "allocation_test_id",
@@ -1486,6 +1498,8 @@ export const order = (placeholder: string): OrderDetailsWithMetadataFragment => 
       quantityFulfilled: 0,
       quantityToFulfill: 3,
       isGift: false,
+      metadata: [],
+      privateMetadata: [],
       allocations: [
         {
           id: "allocation_test_id",
@@ -1599,6 +1613,8 @@ export const order = (placeholder: string): OrderDetailsWithMetadataFragment => 
       quantityFulfilled: 2,
       quantityToFulfill: 0,
       isGift: false,
+      metadata: [],
+      privateMetadata: [],
       allocations: [
         {
           id: "allocation_test_id",
@@ -1877,6 +1893,8 @@ export const draftOrder = (placeholder: string): OrderDetailsWithMetadataFragmen
       quantityFulfilled: 0,
       quantityToFulfill: 2,
       isGift: false,
+      metadata: [],
+      privateMetadata: [],
       allocations: [
         {
           id: "allocation_test_id",
@@ -1990,6 +2008,8 @@ export const draftOrder = (placeholder: string): OrderDetailsWithMetadataFragmen
       quantityFulfilled: 0,
       quantityToFulfill: 2,
       isGift: false,
+      metadata: [],
+      privateMetadata: [],
       allocations: [
         {
           id: "allocation_test_id",

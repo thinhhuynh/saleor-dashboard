@@ -28,6 +28,9 @@ export const fragmentOrderEvent = gql`
       id
       number
     }
+    related {
+      id
+    }
     message
     quantity
     transactionReference
@@ -151,6 +154,7 @@ export const fragmentOrderLine = gql`
 export const fragmentOrderLineWithMetadata = gql`
   fragment OrderLineWithMetadata on OrderLine {
     ...OrderLine
+    ...Metadata
     variant {
       metadata {
         ...MetadataItem
