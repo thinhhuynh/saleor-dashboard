@@ -1,5 +1,4 @@
 /* eslint-disable no-console */
-import { NodeGlobalsPolyfillPlugin } from "@esbuild-plugins/node-globals-polyfill";
 import { sentryVitePlugin } from "@sentry/vite-plugin";
 import react from "@vitejs/plugin-react-swc";
 import { CodeInspectorPlugin } from "code-inspector-plugin";
@@ -44,6 +43,7 @@ export default defineConfig(({ command, mode }) => {
     ENVIRONMENT,
     STATIC_URL,
     APPS_MARKETPLACE_API_URL,
+    EXTENSIONS_API_URL,
     APPS_TUNNEL_URL_KEYWORDS,
     SKIP_SOURCEMAPS,
     DEMO_MODE,
@@ -82,6 +82,7 @@ export default defineConfig(({ command, mode }) => {
           API_URL,
           APP_MOUNT_URI,
           APPS_MARKETPLACE_API_URL,
+          EXTENSIONS_API_URL,
           APPS_TUNNEL_URL_KEYWORDS,
           IS_CLOUD_INSTANCE,
           LOCALE_CODE,
@@ -202,15 +203,6 @@ export default defineConfig(({ command, mode }) => {
     },
     optimizeDeps: {
       include: ["esm-dep > cjs-dep", "@saleor/macaw-ui"],
-      esbuildOptions: {
-        plugins: [
-          /*
-            react-markdown and its dependency tried to call process.cwd().
-            Since it's not present in the browser, we need to polyfill that.
-           */
-          NodeGlobalsPolyfillPlugin({ process: true }),
-        ],
-      },
     },
     resolve: {
       dedupe: ["react", "react-dom", "clsx", "@material-ui/styles"],

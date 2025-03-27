@@ -37,6 +37,7 @@ export const orderListQuery = gql`
             }
           }
           userEmail
+          chargeStatus
         }
       }
       pageInfo {
@@ -132,6 +133,16 @@ export const orderDetailsWithMetadataQuery = gql`
       fulfillmentAutoApprove
       availablePaymentGateways {
         ...PaymentGateway
+      }
+    }
+  }
+`;
+
+export const orderLinesMetadata = gql`
+  query OrderLinesMetadata($id: ID!, $hasManageProducts: Boolean!) {
+    order(id: $id) {
+      lines {
+        ...OrderLineMetadataDetails
       }
     }
   }

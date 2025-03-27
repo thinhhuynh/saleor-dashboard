@@ -19,18 +19,16 @@ export const EventDeliveriesList: React.FC<EventDeliveriesListProps> = ({ eventD
       const { createdAt, id } = ed.node;
       const attempts = ed.node.attempts?.edges?.map(({ node }) => node) ?? [];
       const attemptsCount = attempts.length;
-      const lastAttemptDate = attempts[attemptsCount - 1]?.createdAt;
       const hasMore = index < eventDeliveries.length - 1;
 
       return (
         <EventDeliveryItem
           key={id}
-          dataTestId={id}
+          deliveryId={id}
           createdAt={createdAt}
           status={ed.node.status}
           attemptsCount={attemptsCount}
           attempts={attempts}
-          lastAttemptDate={lastAttemptDate}
           hasMore={hasMore}
         />
       );

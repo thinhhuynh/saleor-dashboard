@@ -109,6 +109,15 @@ export const AppEventDeliveriesFragmentDoc = gql`
         node {
           id
           createdAt
+          attempts(first: 1, sortBy: {field: CREATED_AT, direction: DESC}) {
+            edges {
+              node {
+                id
+                status
+                createdAt
+              }
+            }
+          }
         }
       }
     }
@@ -164,6 +173,14 @@ export const EventDeliveryAttemptFragmentDoc = gql`
   status
   response
   responseStatusCode
+}
+    `;
+export const InstalledAppFragmentDoc = gql`
+    fragment InstalledApp on App {
+  id
+  identifier
+  manifestUrl
+  isActive
 }
     `;
 export const AttributeFragmentDoc = gql`
@@ -1489,6 +1506,40 @@ export const MenuDetailsFragmentDoc = gql`
   name
 }
     ${MenuItemNestedFragmentDoc}`;
+export const OrderLineMetadataFragmentDoc = gql`
+    fragment OrderLineMetadata on OrderLine {
+  metadata {
+    ...MetadataItem
+  }
+  privateMetadata {
+    ...MetadataItem
+  }
+  variant {
+    metadata {
+      ...MetadataItem
+    }
+    privateMetadata @include(if: $hasManageProducts) {
+      ...MetadataItem
+    }
+  }
+}
+    ${MetadataItemFragmentDoc}`;
+export const OrderLineMetadataDetailsFragmentDoc = gql`
+    fragment OrderLineMetadataDetails on OrderLine {
+  id
+  productName
+  productSku
+  quantity
+  thumbnail {
+    url
+  }
+  variant {
+    id
+    name
+  }
+  ...OrderLineMetadata
+}
+    ${OrderLineMetadataFragmentDoc}`;
 export const RefundOrderLineFragmentDoc = gql`
     fragment RefundOrderLine on OrderLine {
   id
@@ -1916,7 +1967,6 @@ export const InvoiceFragmentDoc = gql`
 export const OrderDetailsFragmentDoc = gql`
     fragment OrderDetails on Order {
   id
-  token
   ...Metadata
   billingAddress {
     ...Address
@@ -2072,6 +2122,7 @@ export const OrderDetailsFragmentDoc = gql`
     }
   }
   isPaid
+  chargeStatus
 }
     ${MetadataFragmentDoc}
 ${AddressFragmentDoc}
@@ -2088,19 +2139,10 @@ ${InvoiceFragmentDoc}`;
 export const OrderLineWithMetadataFragmentDoc = gql`
     fragment OrderLineWithMetadata on OrderLine {
   ...OrderLine
-  ...Metadata
-  variant {
-    metadata {
-      ...MetadataItem
-    }
-    privateMetadata @include(if: $hasManageProducts) {
-      ...MetadataItem
-    }
-  }
+  ...OrderLineMetadata
 }
     ${OrderLineFragmentDoc}
-${MetadataFragmentDoc}
-${MetadataItemFragmentDoc}`;
+${OrderLineMetadataFragmentDoc}`;
 export const FulfillmentWithMetadataFragmentDoc = gql`
     fragment FulfillmentWithMetadata on Fulfillment {
   ...Fulfillment
@@ -2119,12 +2161,12 @@ export const OrderDetailsWithMetadataFragmentDoc = gql`
     ...FulfillmentWithMetadata
   }
   lines {
-    ...OrderLineWithMetadata
+    ...OrderLine
   }
 }
     ${OrderDetailsFragmentDoc}
 ${FulfillmentWithMetadataFragmentDoc}
-${OrderLineWithMetadataFragmentDoc}`;
+${OrderLineFragmentDoc}`;
 export const OrderSettingsFragmentDoc = gql`
     fragment OrderSettings on OrderSettings {
   automaticallyConfirmAllNewOrders
@@ -2991,13 +3033,18 @@ export const ShippingMethodWithExcludedProductsFragmentDoc = gql`
   }
 }
     ${ShippingMethodTypeFragmentDoc}`;
+export const CountryFragmentDoc = gql`
+    fragment Country on CountryDisplay {
+  country
+  code
+}
+    `;
 export const ShippingZoneFragmentDoc = gql`
     fragment ShippingZone on ShippingZone {
   ...Metadata
   id
   countries {
-    code
-    country
+    ...Country
   }
   name
   description
@@ -3011,6 +3058,7 @@ export const ShippingZoneFragmentDoc = gql`
   }
 }
     ${MetadataFragmentDoc}
+${CountryFragmentDoc}
 ${MoneyFragmentDoc}`;
 export const ShippingZoneDetailsFragmentDoc = gql`
     fragment ShippingZoneDetails on ShippingZone {
@@ -3096,12 +3144,6 @@ export const StaffMemberDetailsFragmentDoc = gql`
   }
 }
     ${StaffMemberFragmentDoc}`;
-export const CountryFragmentDoc = gql`
-    fragment Country on CountryDisplay {
-  country
-  code
-}
-    `;
 export const CountryWithCodeFragmentDoc = gql`
     fragment CountryWithCode on CountryDisplay {
   country
@@ -4231,14 +4273,14 @@ export const AppWebhookDeliveriesDocument = gql`
       asyncEvents {
         name
       }
-      eventDeliveries(first: 10) {
+      eventDeliveries(first: 10, sortBy: {field: CREATED_AT, direction: DESC}) {
         edges {
           node {
             id
             createdAt
             status
             eventType
-            attempts(first: 10) {
+            attempts(first: 10, sortBy: {field: CREATED_AT, direction: DESC}) {
               edges {
                 node {
                   ...EventDeliveryAttempt
@@ -6977,6 +7019,11 @@ export const SearchCatalogDocument = gql`
       node {
         id
         name
+        backgroundImage(size: 64) {
+          url
+          alt
+        }
+        level
       }
     }
   }
@@ -6984,6 +7031,10 @@ export const SearchCatalogDocument = gql`
     edges {
       node {
         ...Collection
+        backgroundImage(size: 64) {
+          url
+          alt
+        }
       }
     }
   }
@@ -6996,6 +7047,31 @@ export const SearchCatalogDocument = gql`
           name
         }
         name
+        thumbnail(size: 64) {
+          alt
+          url
+        }
+      }
+    }
+  }
+  productVariants(first: $first, filter: {search: $query}) {
+    edges {
+      node {
+        id
+        name
+        sku
+        product {
+          id
+          name
+          category {
+            id
+            name
+          }
+          thumbnail(size: 64) {
+            alt
+            url
+          }
+        }
       }
     }
   }
@@ -7768,7 +7844,7 @@ export const CustomerDetailsDocument = gql`
     privateMetadata @include(if: $PERMISSION_MANAGE_STAFF) {
       ...MetadataItem
     }
-    orders(last: 5) @include(if: $PERMISSION_MANAGE_ORDERS) {
+    orders(first: 5) @include(if: $PERMISSION_MANAGE_ORDERS) {
       edges {
         node {
           id
@@ -7781,10 +7857,11 @@ export const CustomerDetailsDocument = gql`
               amount
             }
           }
+          chargeStatus
         }
       }
     }
-    lastPlacedOrder: orders(last: 1) @include(if: $PERMISSION_MANAGE_ORDERS) {
+    lastPlacedOrder: orders(first: 1) @include(if: $PERMISSION_MANAGE_ORDERS) {
       edges {
         node {
           id
@@ -9211,6 +9288,55 @@ export function usePromotionDetailsQueryLazyQuery(baseOptions?: ApolloReactHooks
 export type PromotionDetailsQueryQueryHookResult = ReturnType<typeof usePromotionDetailsQueryQuery>;
 export type PromotionDetailsQueryLazyQueryHookResult = ReturnType<typeof usePromotionDetailsQueryLazyQuery>;
 export type PromotionDetailsQueryQueryResult = Apollo.QueryResult<Types.PromotionDetailsQueryQuery, Types.PromotionDetailsQueryQueryVariables>;
+export const InstalledAppsDocument = gql`
+    query InstalledApps($before: String, $after: String, $first: Int, $last: Int) {
+  apps(before: $before, after: $after, first: $first, last: $last) {
+    pageInfo {
+      hasNextPage
+      hasPreviousPage
+      startCursor
+      endCursor
+    }
+    totalCount
+    edges {
+      node {
+        ...InstalledApp
+      }
+    }
+  }
+}
+    ${InstalledAppFragmentDoc}`;
+
+/**
+ * __useInstalledAppsQuery__
+ *
+ * To run a query within a React component, call `useInstalledAppsQuery` and pass it any options that fit your needs.
+ * When your component renders, `useInstalledAppsQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useInstalledAppsQuery({
+ *   variables: {
+ *      before: // value for 'before'
+ *      after: // value for 'after'
+ *      first: // value for 'first'
+ *      last: // value for 'last'
+ *   },
+ * });
+ */
+export function useInstalledAppsQuery(baseOptions?: ApolloReactHooks.QueryHookOptions<Types.InstalledAppsQuery, Types.InstalledAppsQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return ApolloReactHooks.useQuery<Types.InstalledAppsQuery, Types.InstalledAppsQueryVariables>(InstalledAppsDocument, options);
+      }
+export function useInstalledAppsLazyQuery(baseOptions?: ApolloReactHooks.LazyQueryHookOptions<Types.InstalledAppsQuery, Types.InstalledAppsQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return ApolloReactHooks.useLazyQuery<Types.InstalledAppsQuery, Types.InstalledAppsQueryVariables>(InstalledAppsDocument, options);
+        }
+export type InstalledAppsQueryHookResult = ReturnType<typeof useInstalledAppsQuery>;
+export type InstalledAppsLazyQueryHookResult = ReturnType<typeof useInstalledAppsLazyQuery>;
+export type InstalledAppsQueryResult = Apollo.QueryResult<Types.InstalledAppsQuery, Types.InstalledAppsQueryVariables>;
 export const FileUploadDocument = gql`
     mutation FileUpload($file: Upload!) {
   fileUpload(file: $file) {
@@ -12154,6 +12280,7 @@ export const OrderListDocument = gql`
           }
         }
         userEmail
+        chargeStatus
       }
     }
     pageInfo {
@@ -12369,6 +12496,44 @@ export function useOrderDetailsWithMetadataLazyQuery(baseOptions?: ApolloReactHo
 export type OrderDetailsWithMetadataQueryHookResult = ReturnType<typeof useOrderDetailsWithMetadataQuery>;
 export type OrderDetailsWithMetadataLazyQueryHookResult = ReturnType<typeof useOrderDetailsWithMetadataLazyQuery>;
 export type OrderDetailsWithMetadataQueryResult = Apollo.QueryResult<Types.OrderDetailsWithMetadataQuery, Types.OrderDetailsWithMetadataQueryVariables>;
+export const OrderLinesMetadataDocument = gql`
+    query OrderLinesMetadata($id: ID!, $hasManageProducts: Boolean!) {
+  order(id: $id) {
+    lines {
+      ...OrderLineMetadataDetails
+    }
+  }
+}
+    ${OrderLineMetadataDetailsFragmentDoc}`;
+
+/**
+ * __useOrderLinesMetadataQuery__
+ *
+ * To run a query within a React component, call `useOrderLinesMetadataQuery` and pass it any options that fit your needs.
+ * When your component renders, `useOrderLinesMetadataQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useOrderLinesMetadataQuery({
+ *   variables: {
+ *      id: // value for 'id'
+ *      hasManageProducts: // value for 'hasManageProducts'
+ *   },
+ * });
+ */
+export function useOrderLinesMetadataQuery(baseOptions: ApolloReactHooks.QueryHookOptions<Types.OrderLinesMetadataQuery, Types.OrderLinesMetadataQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return ApolloReactHooks.useQuery<Types.OrderLinesMetadataQuery, Types.OrderLinesMetadataQueryVariables>(OrderLinesMetadataDocument, options);
+      }
+export function useOrderLinesMetadataLazyQuery(baseOptions?: ApolloReactHooks.LazyQueryHookOptions<Types.OrderLinesMetadataQuery, Types.OrderLinesMetadataQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return ApolloReactHooks.useLazyQuery<Types.OrderLinesMetadataQuery, Types.OrderLinesMetadataQueryVariables>(OrderLinesMetadataDocument, options);
+        }
+export type OrderLinesMetadataQueryHookResult = ReturnType<typeof useOrderLinesMetadataQuery>;
+export type OrderLinesMetadataLazyQueryHookResult = ReturnType<typeof useOrderLinesMetadataLazyQuery>;
+export type OrderLinesMetadataQueryResult = Apollo.QueryResult<Types.OrderLinesMetadataQuery, Types.OrderLinesMetadataQueryVariables>;
 export const OrderDetailsGrantRefundDocument = gql`
     query OrderDetailsGrantRefund($id: ID!) {
   order(id: $id) {
@@ -17018,16 +17183,12 @@ export const CreateShippingZoneDocument = gql`
       ...ShippingError
     }
     shippingZone {
-      countries {
-        ...Country
-      }
-      id
-      name
+      ...ShippingZone
     }
   }
 }
     ${ShippingErrorFragmentDoc}
-${CountryFragmentDoc}`;
+${ShippingZoneFragmentDoc}`;
 export type CreateShippingZoneMutationFn = Apollo.MutationFunction<Types.CreateShippingZoneMutation, Types.CreateShippingZoneMutationVariables>;
 
 /**
@@ -17061,16 +17222,21 @@ export const UpdateShippingZoneDocument = gql`
       ...ShippingError
     }
     shippingZone {
-      countries {
-        ...Country
+      ...ShippingZone
+      channels {
+        id
+        name
+        currencyCode
       }
-      id
-      name
+      warehouses {
+        id
+        name
+      }
     }
   }
 }
     ${ShippingErrorFragmentDoc}
-${CountryFragmentDoc}`;
+${ShippingZoneFragmentDoc}`;
 export type UpdateShippingZoneMutationFn = Apollo.MutationFunction<Types.UpdateShippingZoneMutation, Types.UpdateShippingZoneMutationVariables>;
 
 /**
